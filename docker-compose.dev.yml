@@ -1,0 +1,107 @@
+services:
+  backend: &backend
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend/:/app/backend
+    ports:
+      - 8000:8000
+    env_file:
+      - ./.env.dev
+    depends_on:
+      backend_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  backend_db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - backend_db_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.dev
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - 6379:6379
+    restart: always
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+  celery:
+    <<: *backend
+    command: celery -A config worker --loglevel=info -n worker1
+    depends_on:
+      - redis
+    entrypoint: []
+    ports: []
+
+  celery-beat:
+    <<: *backend
+    command: celery -A config beat
+    depends_on:
+      - redis
+    entrypoint: []
+    ports: []
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_APP_BUILD_VERSION: ${VITE_APP_BUILD_VERSION}
+    volumes:
+      - ./frontend:/app/frontend
+      - node_modules:/app/frontend/node_modules
+    env_file:
+      - ./.env.dev
+    ports:
+      - "3000:3000"
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-v2.12.1
+    environment:
+      TRACKER_SCRIPT_NAME: getinfo
+      API_COLLECT_ENDPOINT: all
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      DATABASE_URL: ${UMAMI_DATABASE_URL}
+    depends_on:
+      umami_db:
+        condition: service_healthy
+    env_file:
+      - ./.env.dev
+    ports:
+      - "3001:3000"
+    restart: always
+
+  umami_db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - umami_db_data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${UMAMI_POSTGRES_DB}
+      POSTGRES_USER: ${UMAMI_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${UMAMI_POSTGRES_PASSWORD}
+    env_file:
+      - ./.env.dev
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  backend_db_data:
+  umami_db_data:
+  node_modules: {}
+  redis_data:

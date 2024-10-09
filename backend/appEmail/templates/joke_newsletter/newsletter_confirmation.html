@@ -1,0 +1,32 @@
+{% extends "base/base_email.html" %}
+
+{% block title %}Du bist jetzt dabei!{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 24px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Willkommen zum
+    Der-Witz-Des-Tages Newsletter! 🎉</h1>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Hey {{ reciever.email }},
+</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Super, du bist jetzt Teil
+    bei Der-Witz-des-Tages Community! Ab sofort erhältst du täglich die besten Witze direkt
+    in
+    dein Postfach.</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Wir freuen uns, dich zum
+    Lachen zu bringen und hoffen, dass dir unsere Witze gefallen werden.</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Du hast selbst einen Witz
+    💎 auf Lager, und brennst darauf diesen mit der Welt 🌍 zu teilen? Dann spende diesen
+    doch einfach! Erstelle ein Konto bei uns und schicke uns deine besten Kreationen!</p>
+<a style="background-color: #8b5cf6; padding: 10px 20px; color: #ffffff; border-radius: 5px; display: inline-block; text-decoration: none;"
+    href="{{ home_link }}" class="button">Zur Webseite</a>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Falls du irgendwann genug
+    von unseren Witzen hast, kannst du dich jederzeit über den Link in den täglichen
+    Der-Witz-des-Tages Emails abmelden. Aber wir hoffen natürlich, dass du bleibst! 😉</p>
+{% endblock %}
+
+{% block footer %}
+<p
+    style="color: #666666; font-size: 14px; line-height: 1.5; margin: 10px 0 0; font-family: Inter, Roboto, Arial, sans-serif;">
+    Hast du Fragen, Anregungen oder möchtest einen Bug melden? Dann kontaktiere bitte den <a href="{{ contact_link }}"
+        style="color: #8b5cf6; text-decoration: none;">Der-Witz-Des-Tages Support</a>
+</p>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base/base_email.html" %}
+
+{% block title %}Der-Witz-des-Tages! 🚀{% endblock %}
+
+{% block content %}
+<table cellpadding="0" cellspacing="0" border="0" width="100%"
+    style="text-align: center; width:100%; align-items: center;">
+    <tr>
+        <td>
+            <h1
+                style="padding: 0px; margin: 0px; font-size: 24px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">
+                {{ joke }}</h1>
+            <h3
+                style="padding: 0px; margin: 0px; font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">
+                {{ date }}</h3>
+            <h3
+                style="padding: 0px; margin: 0px; margin-bottom: 20px; font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">
+                von: {{ username }}</h3>
+            <img src="cid:{{ joke_image_cid }}" alt="Der-Witz-des-Tages-Foto" class="image"
+                style="border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; -ms-border-radius: 8px; -o-border-radius: 8px; max-width: 100%; height: auto;">
+
+        </td>
+    </tr>
+</table>
+{% endblock %}
+
+{% block footer %}
+<p
+    style="color: #666666; font-size: 14px; line-height: 1.5; margin: 10px 0 0; font-family: Inter, Roboto, Arial, sans-serif;">
+    Hast du Fragen, Anregungen oder möchtest einen Bug melden? Dann kontaktiere bitte den <a href="{{ contact_link }}"
+        style="color: #8b5cf6; text-decoration: none;">Der-Witz-Des-Tages Support</a>
+</p>
+<p
+    style="color: #666666; font-size: 14px; line-height: 1.5; margin: 10px 0 0; font-family: Inter, Roboto, Arial, sans-serif;">
+    Du hast keine Lust mehr auf den Witz des Tages? <a href="{{ unsubscribe_link }}"
+        style="color: #8b5cf6; text-decoration: none;">Newsletter abbestellen</a>
+</p>
+{% endblock %}

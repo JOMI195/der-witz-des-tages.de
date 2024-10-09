@@ -1,0 +1,152 @@
+services:
+  backend: &backend
+    container_name: backend
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile.prod
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/home/app/backend/staticfiles
+      - media_volume:/home/app/backend/mediafiles
+    expose:
+      - 8000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      backend_db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  backend_db:
+    container_name: backend_db
+    image: postgres:15
+    restart: always
+    env_file:
+      - ./.env.prod
+    volumes:
+      - backend_db_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:6.2.11-alpine
+    expose:
+      - 6379
+    restart: always
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+  celery:
+    <<: *backend
+    container_name: celery
+    command: celery -A config worker --loglevel=info -n worker1
+    depends_on:
+      - redis
+      - backend
+    entrypoint: []
+    ports: []
+
+  celery-beat:
+    <<: *backend
+    container_name: celery-beat
+    command: celery -A config beat
+    depends_on:
+      - redis
+      - backend
+    entrypoint: []
+    ports: []
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile.prod
+      args:
+        VITE_APP_BUILD_VERSION: ${VITE_APP_BUILD_VERSION}
+    volumes:
+      - static_volume:/home/app/backend/staticfiles
+      - media_volume:/home/app/backend/mediafiles
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+      - /var/log/nginx:/var/log/nginx
+    depends_on:
+      backend:
+        condition: service_started
+      umami:
+        condition: service_started
+    ports:
+      - 80:80
+      - 5432:5432
+      - 443:443
+    env_file:
+      - ./.env.prod
+
+  certbot:
+    image: certbot/certbot:v1.32.0
+    restart: unless-stopped
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  umami:
+    container_name: umami
+    build:
+      context: .
+      dockerfile: ./umami/Dockerfile
+      args:
+        BASE_PATH: ${UMAMI_BASE_PATH}
+        DATABASE_TYPE: ${UMAMI_DATABASE_TYPE}
+    environment:
+      DATABASE_URL: ${UMAMI_DATABASE_URL}
+      HASH_SALT: ${UMAMI_HASH_SALT}
+      APP_SECRET: ${UMAMI_APP_SECRET}
+      BASE_PATH: ${UMAMI_BASE_PATH}
+      DATABASE_TYPE: ${UMAMI_DATABASE_TYPE}
+      TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
+      API_COLLECT_ENDPOINT: ${UMAMI_API_COLLECT_ENDPOINT}
+      FORCE_SSL: ${UMAMI_FORCE_SSL}
+      CLIENT_IP_HEADER: ${UMAMI_CLIENT_IP_HEADER}
+    depends_on:
+      umami_db:
+        condition: service_healthy
+    env_file:
+      - ./.env.prod
+    expose:
+      - 3000
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "curl https://der-witz-des-tages.de/analytics/api/heartbeat" ]
+      interval: 3600s
+      timeout: 30s
+      retries: 5
+
+  umami_db:
+    container_name: umami_db
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${UMAMI_POSTGRES_DB}
+      POSTGRES_USER: ${UMAMI_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${UMAMI_POSTGRES_PASSWORD}
+    volumes:
+      - umami_db_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env.prod
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${UMAMI_POSTGRES_USER} -d $${UMAMI_POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  backend_db_data:
+  umami_db_data:
+  static_volume:
+  media_volume:
+  redis_data:

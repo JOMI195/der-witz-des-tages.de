@@ -1,0 +1,8 @@
+.git
+docker-compose.yml
+Dockerfile
+Dockerfile.prod
+.gitignore
+.DS_Store
+node_modules
+.idea

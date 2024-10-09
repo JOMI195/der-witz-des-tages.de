@@ -1,0 +1,31 @@
+{% extends "base/base_email.html" %}
+
+{% block title %}Aktiviere deinen täglichen Lacher! 😆{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 24px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Willkommen beim
+    Der-Witz-Des-Tages Newsletter! 🎉😜</h1>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Hey {{ reciever.email }},
+</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Super, dass du am Start
+    bist! Du bist nur noch einen Klick davon entfernt, jeden Tag mit freshen Witzen zum
+    Lachen
+    gebracht zu werden.</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Drück einfach auf den
+    Button unten, und schon kann’s mit deiner täglichen Portion Spaß losgehen:</p>
+<a style="background-color: #8b5cf6; padding: 10px 20px; color: #ffffff; border-radius: 5px; display: inline-block; text-decoration: none;"
+    href="{{ activation_link }}" class="button">Lacher aktivieren!</a>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Dieser Bestätigungslink
+    verliert nach 24 Stunden seine Gültigkeit. Nach Ablauf dieser Zeit ohne Bestätigung des
+    Wunsches nach Erhalt des Newsletters, musst du dich für diesen erneut anmelden.</p>
+<p style="font-size: 16px; line-height: 1.5; font-family: Inter, Roboto, Arial, sans-serif;">Falls du dich nicht selbst
+    angemeldet hast, kannst du diese E-Mail ganz entspannt ignorieren. Kein Stress!</p>
+{% endblock %}
+
+{% block footer %}
+<p
+    style="color: #666666; font-size: 14px; line-height: 1.5; margin: 10px 0 0; font-family: Inter, Roboto, Arial, sans-serif;">
+    Hast du Fragen, Anregungen oder möchtest einen Bug melden? Dann kontaktiere bitte den <a href="{{ contact_link }}"
+        style="color: #8b5cf6; text-decoration: none;">Der-Witz-Des-Tages Support</a>
+</p>
+{% endblock %}
