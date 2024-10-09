@@ -1,7 +1,7 @@
 <img src="./images/brand/witz-des-tages-logo-light-full.png" 
 alt="Logo" width="400"/>
 
-# der-witz-des-tag.de
+# der-witz-des-tages.de
 Website link: [https://www.der-witz-des-tages.de](https://www.der-witz-des-tages.de)
 
 ## Description
