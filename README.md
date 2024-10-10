@@ -2,6 +2,14 @@
 alt="Logo" width="400"/>
 
 # der-witz-des-tages.de
+<p align="left">
+    <a href="http://hits.dwyl.com/JOMI195/der-witz-des-tagesde">
+        <img src="https://hits.dwyl.com/JOMI195/der-witz-des-tagesde.svg?style=flat-square" alt="HitCount" />
+    </a>
+    <img alt="Static Badge" src="https://img.shields.io/badge/Funny Jokes-100_%25-blue">
+    <img alt="Static Badge" src="https://img.shields.io/badge/License-private-red">
+</p>
+
 Website link: [https://www.der-witz-des-tages.de](https://www.der-witz-des-tages.de)
 
 ## Description
