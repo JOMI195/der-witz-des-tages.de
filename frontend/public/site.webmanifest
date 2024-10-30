@@ -1,7 +1,7 @@
 {
     "name": "der-witz-des-tages",
     "short_name": "der-witz-des-tages",
-    "description": "Web-app for serving daily jokes.",
+    "description": "Erhalte jede Tag einen neuen Flachwitz als Newsletter und auf www.der-witz-des-tages.de",
     "icons": [
         {
             "src": "/android-chrome-192x192.png?v=1",

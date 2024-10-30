@@ -25,29 +25,4 @@
     <changefreq>yearly</changefreq>
     <priority>0.1</priority>
   </url>
-  <url>
-    <loc>https://der-witz-des-tages.de/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://der-witz-des-tages.de/witz-einreichen/</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://der-witz-des-tages.de/kontakt/</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://der-witz-des-tages.de/datenschutzerklaerung/</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
-  <url>
-    <loc>https://der-witz-des-tages.de/impressum/</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.1</priority>
-  </url>
 </urlset>
