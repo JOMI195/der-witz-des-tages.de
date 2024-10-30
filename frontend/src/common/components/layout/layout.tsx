@@ -5,6 +5,7 @@ import Footer from "./bottomLayout/footer";
 import { useAppSelector } from "@/store";
 import { getNavigation } from "@/store/ui/settings/settings.slice";
 import { getSelectedFeature } from "@/store/ui/navigation/navigation.slice";
+import SignUpOptionsDialog from "./topLayout/dialogs/signUpOptions/signUpOptions";
 
 const MainLayout: React.FC = () => {
     const theme = useTheme();
@@ -16,6 +17,7 @@ const MainLayout: React.FC = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <TopAppbar />
             <ScrollRestoration />
+            <SignUpOptionsDialog />
             <Container
                 maxWidth="xl"
                 sx={{

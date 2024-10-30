@@ -4,14 +4,20 @@ import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import PublishIcon from '@mui/icons-material/Publish';
+import EmailIcon from '@mui/icons-material/Email';
 import { IAccountMenuItem, IAppBarMenuItem } from "@/types";
-import { getSubmitJokeUrl } from "../endpoints/app/appEndpoints";
+import { getHomeUrl, getSubmitJokeUrl } from "../endpoints/app/appEndpoints";
 
 export const appBarMenuItems: IAppBarMenuItem[] = [
     {
-        name: "Newsletter",
-        url: "/",
+        name: "Witz des Tages",
+        url: getHomeUrl(),
         icon: HomeIcon
+    },
+    {
+        name: "Newsletter",
+        url: getHomeUrl(),
+        icon: EmailIcon
     },
     // {
     //     name: "Archiv",

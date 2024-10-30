@@ -171,6 +171,7 @@ const Home = () => {
                     }}
                 >
                     <Card
+                        id="newsletterSignUp"
                         elevation={10}
                         sx={{
                             p: isMobile ? 2 : 5,
