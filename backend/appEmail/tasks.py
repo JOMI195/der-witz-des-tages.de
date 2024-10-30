@@ -88,7 +88,7 @@ def send_django_mail_with_logo(
                     settings.BASE_DIR,
                     "mediafiles",
                     "brand",
-                    "witz-des-tages-logo-light-full-email.png",
+                    "witz-des-tages-logo-light-full.png",
                 ),
                 "cid": "logo_image",
                 "template_identifier": "logo_image_cid",

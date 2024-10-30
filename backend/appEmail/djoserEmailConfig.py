@@ -49,7 +49,7 @@ from djoser.email import (
 #         settings.BASE_DIR,
 #         "mediafiles",
 #         "brand",
-#         "witz-des-tages-logo-light-full-email.png",
+#         "witz-des-tages-logo-light-full.png",
 #     )
 #     with open(logo_path, "rb") as f:
 #         logo_image = MIMEImage(f.read())
