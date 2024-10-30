@@ -75,7 +75,7 @@ const SignUpOptionsDialog: React.FC = () => {
             PaperProps={{
                 sx: {
                     bgcolor: 'background.default',
-                    p: 4,
+                    p: 1,
                 }
             }}
         >
