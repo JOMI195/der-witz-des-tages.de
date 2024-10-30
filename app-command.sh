@@ -32,14 +32,14 @@ export VITE_APP_BUILD_VERSION=$BUILD_VERSION
 
 # Run the Docker Compose command
 if [ "$CONTAINER_NAME" == "all" ]; then
-  docker compose -p "witz-des-tages" -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" $DOCKER_COMPOSE_COMMAND
+  docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" $DOCKER_COMPOSE_COMMAND
 else
   # Check if the specified container exists
-  if ! docker compose -p "witz-des-tages" -f "$DOCKER_COMPOSE_FILE" ps -q "$CONTAINER_NAME" > /dev/null; then
+  if ! docker compose -f "$DOCKER_COMPOSE_FILE" ps -q "$CONTAINER_NAME" > /dev/null; then
     echo "Error: Container '$CONTAINER_NAME' not found in the Docker Compose file!"
     exit 1
   fi
 
   # Run the command on the specified container
-  docker compose -p "witz-des-tages" -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" $DOCKER_COMPOSE_COMMAND "$CONTAINER_NAME"
+  docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" $DOCKER_COMPOSE_COMMAND "$CONTAINER_NAME"
 fi
