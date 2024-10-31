@@ -33,7 +33,7 @@ const options: SignUpOption[] = [
     },
     {
         icon: <PersonIcon sx={{ fontSize: 40 }} />,
-        title: 'Account',
+        title: 'Konto',
         path: getAuthenticationUrl() + getSignInUrl(),
         disabled: false
     },
@@ -122,7 +122,7 @@ const SignUpOptionsDialog: React.FC = () => {
                     variant="body1"
                     sx={{ mt: 4, textAlign: 'center' }}
                 >
-                    Bitte wähle eine der obenstehenden Optionen aus. Ein Account wird nur benötigt wenn du einen Witz einreichen willst.
+                    Bitte wähle eine der obenstehenden Optionen aus. Ein Konto wird nur benötigt wenn du einen Witz einreichen willst.
                 </Typography>
             </DialogContent>
         </Dialog>

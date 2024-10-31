@@ -5,8 +5,10 @@ import { store } from './store/index.ts';
 import http from "./services/httpService";
 import '@fontsource/inter';
 import StoreGate from './common/components/storeGate.tsx';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import localStorageBuildVersionUpdate from './common/components/localStorageBuildVersionUpdateService.ts';
+import ErrorBoundary from './common/components/error/errorBoundary/errorBoundary.tsx';
+import LoadingFallback from './common/components/loadingFallback.tsx';
 
 const AppWrapper = () => {
 
@@ -23,17 +25,23 @@ const AppWrapper = () => {
   }, []);
 
   return (
-    <Provider store={store}>
-      <StoreGate>
-        <App />
-      </StoreGate>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <StoreGate>
+          <App />
+        </StoreGate>
+      </Provider>
+    </ErrorBoundary>
   );
 };
 
 const container = document.getElementById("root");
 const root = createRoot(container!);
 
-root.render(<AppWrapper />);
+root.render(
+  <Suspense fallback={<LoadingFallback />}>
+    <AppWrapper />
+  </Suspense>
+);
 
 http.apiSetup(store);
