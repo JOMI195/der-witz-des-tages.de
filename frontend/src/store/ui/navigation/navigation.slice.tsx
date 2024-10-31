@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { createSlice } from "@reduxjs/toolkit";
 
 type SliceState = {
@@ -47,8 +48,8 @@ export const {
 
 export default navigationSlice.reducer;
 
-export const getSelectedFeature = (state: any) =>
+export const getSelectedFeature = (state: RootState) =>
   state.ui.navigation.selectedFeature;
 
-export const getDialogs = (state: any) =>
+export const getDialogs = (state: RootState) =>
   state.ui.navigation.dialogs;

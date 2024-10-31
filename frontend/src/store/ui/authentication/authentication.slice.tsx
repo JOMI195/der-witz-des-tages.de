@@ -27,6 +27,7 @@ import {
   userUpdatePending,
   userUpdateRejected,
 } from "../../entities/authentication/authentication.slice";
+import { RootState } from "@/store";
 
 type SliceState = {
   snackbar: {
@@ -331,8 +332,13 @@ export const closeAuthLoadingSnackbar = () => ({
   type: loadingSnackbarClosed.type,
 });
 
-const { alertSnackbarOpened, alertSnackbarClosed, loadingSnackbarOpened, loadingSnackbarClosed } = authSlice.actions;
-
-export const getAuthSnackbar = (state: any) => state.ui.auth.snackbar;
+const {
+  alertSnackbarOpened,
+  alertSnackbarClosed,
+  loadingSnackbarOpened,
+  loadingSnackbarClosed
+} = authSlice.actions;
 
 export default authSlice.reducer;
+
+export const getAuthSnackbar = (state: RootState) => state.ui.auth.snackbar;

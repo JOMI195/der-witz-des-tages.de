@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { createSlice } from "@reduxjs/toolkit";
 
 type SliceState = {
@@ -64,4 +65,4 @@ export const {
 } = jokeNewsletterSlice.actions;
 export default jokeNewsletterSlice.reducer;
 
-export const getApi = (state: any) => state.entities.jokeNewsletter.api;
+export const getApi = (state: RootState) => state.entities.jokeNewsletter.api;

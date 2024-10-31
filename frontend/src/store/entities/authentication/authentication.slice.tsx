@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { IUser } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -234,6 +235,6 @@ export const {
 } = userSlice.actions;
 export default userSlice.reducer;
 
-export const getApi = (state: any) => state.auth.user.api;
-export const getUser = (state: any) => state.auth.user;
-export const getMyUserDetails = (state: any) => state.auth.user.me;
+export const getApi = (state: RootState) => state.auth.user.api;
+export const getUser = (state: RootState) => state.auth.user;
+export const getMyUserDetails = (state: RootState) => state.auth.user.me;

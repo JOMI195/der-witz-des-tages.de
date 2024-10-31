@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { contactEmailSendingFailed, contactEmailSendingFulfilled, contactEmailSendingPending } from "@/store/entities/contact/contact.slice";
 import { AlertColor } from "@mui/material";
 import { createSlice } from "@reduxjs/toolkit";
@@ -110,4 +111,4 @@ export const {
 } = contactSlice.actions;
 export default contactSlice.reducer;
 
-export const getContactSnackbar = (state: any) => state.ui.contact.snackbar;
+export const getContactSnackbar = (state: RootState) => state.ui.contact.snackbar;

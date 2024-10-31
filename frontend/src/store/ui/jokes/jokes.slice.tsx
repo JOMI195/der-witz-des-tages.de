@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { jokeSubmitFailed, jokeSubmitFulfilled, jokeSubmitPending } from "@/store/entities/jokes/jokes.slice";
 import { AlertColor } from "@mui/material";
 import { createSlice } from "@reduxjs/toolkit";
@@ -110,4 +111,4 @@ export const {
 } = jokesSlice.actions;
 export default jokesSlice.reducer;
 
-export const getJokesSnackbar = (state: any) => state.ui.jokes.snackbar;
+export const getJokesSnackbar = (state: RootState) => state.ui.jokes.snackbar;

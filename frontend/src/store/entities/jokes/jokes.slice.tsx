@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { IJoke, IJokesWithPicturesPaginated } from "@/types";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -93,6 +94,6 @@ export const {
 } = jokesSlice.actions;
 export default jokesSlice.reducer;
 
-export const getApi = (state: any) => state.entities.jokes.api;
-export const getJokeOfTheDay = (state: any) => state.entities.jokes.joke_of_the_day;
-export const getJokesWithPicturesPaginated = (state: any) => state.entities.jokes.jokes_with_pictures_paginated;
+export const getApi = (state: RootState) => state.entities.jokes.api;
+export const getJokeOfTheDay = (state: RootState) => state.entities.jokes.joke_of_the_day;
+export const getJokesWithPicturesPaginated = (state: RootState) => state.entities.jokes.jokes_with_pictures_paginated;

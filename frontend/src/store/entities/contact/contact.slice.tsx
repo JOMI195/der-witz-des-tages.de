@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { createSlice } from "@reduxjs/toolkit";
 
 type SliceState = {
@@ -38,4 +39,4 @@ export const {
 } = contactSlice.actions;
 export default contactSlice.reducer;
 
-export const getApi = (state: any) => state.entities.contact.api;
+export const getApi = (state: RootState) => state.entities.contact.api;

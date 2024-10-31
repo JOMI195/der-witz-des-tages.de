@@ -1,3 +1,4 @@
+import { RootState } from "@/store";
 import { activateJokeNewsletterSubscriptionFailed, activateJokeNewsletterSubscriptionFulfilled, activateJokeNewsletterSubscriptionRequested, subscribeToNewsletterFailed, subscribeToNewsletterFulfilled, subscribeToNewsletterRequested, unsubscribeFromNewsletterFailed, unsubscribeFromNewsletterFulfilled, unsubscribeFromNewsletterRequested } from "@/store/entities/jokeNewsletter/jokeNewsletter.slice";
 import { AlertColor } from "@mui/material";
 import { createSlice } from "@reduxjs/toolkit";
@@ -166,4 +167,4 @@ export const {
 } = jokeNewsletterSlice.actions;
 export default jokeNewsletterSlice.reducer;
 
-export const getJokeNewsletterSnackbar = (state: any) => state.ui.jokeNewsletter.snackbar;
+export const getJokeNewsletterSnackbar = (state: RootState) => state.ui.jokeNewsletter.snackbar;
