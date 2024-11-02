@@ -1,10 +1,17 @@
 from typing import Dict
-from django.core.exceptions import ObjectDoesNotExist
-from jokes.models import Joke
-from jokes.joke_picture.joke import create_joke_of_the_day_entry, get_joke_of_the_day
-from jokes.joke_picture.joke_picture import get_or_create_joke_picture
 from config.celery import celery
 from random import choice
+from django.core.exceptions import ObjectDoesNotExist
+from jokes.sharableImage.screenshot import capture_screenshot
+from jokes.sharableImage.template import get_shareable_image_html_template
+from jokes.sharableImage.sharableImage import save_shareable_image_to_model
+from jokes.models import Joke, JokePicture
+from jokes.joke_of_the_day.joke_of_the_day import (
+    create_joke_of_the_day_entry,
+    get_joke_of_the_day,
+    get_latest_joke_of_the_day,
+)
+from jokes.joke_picture.joke_picture import get_or_create_joke_picture
 
 
 @celery.task
@@ -37,3 +44,26 @@ def get_allready_created_joke_of_the_day() -> Dict[str, int]:
         raise ValueError("Selected joke does not have an associated picture.")
 
     return {"joke_id": random_joke.id}
+
+
+@celery.task
+def create_shareable_image(*args, **kwargs):
+    latest_joke_of_the_day: Joke = get_latest_joke_of_the_day()
+    related_joke_picture: JokePicture = latest_joke_of_the_day.joke.joke_picture
+
+    html_content = get_shareable_image_html_template(
+        joke=latest_joke_of_the_day.joke, image_field=related_joke_picture.image
+    )
+
+    image_data = capture_screenshot(html_content)
+
+    shareable_image = save_shareable_image_to_model(
+        joke=latest_joke_of_the_day.joke, image_data=image_data
+    )
+
+    return f"{shareable_image} saved to {shareable_image.image.path}"
+
+
+@celery.task
+def share_on_socials(*args, **kwargs):
+    pass

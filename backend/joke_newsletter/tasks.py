@@ -1,7 +1,6 @@
 from copy import copy
 from django.utils import timezone
 from datetime import timedelta
-from celery import chain
 from django.conf import settings
 from datetime import date
 from celery import group
@@ -11,11 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from appEmail.tasks import send_django_mail_with_logo
 from jokes.models import Joke, JokePicture
 from .models import NewsletterReciever
-from jokes.tasks import (
-    create_joke_picture,
-    get_allready_created_joke_of_the_day,
-    select_joke_of_the_day,
-)
 from config.celery import celery
 from django.shortcuts import get_object_or_404
 
@@ -105,35 +99,6 @@ def send_newsletter(joke_data, recipient_emails=None, batch_delay=5):
         "status": "Newsletter sending initiated",
         "subscriber_count": subscriber_count,
     }
-
-
-@celery.task
-def joke_of_the_day_full_workflow():
-    chain(
-        select_joke_of_the_day.s(), create_joke_picture.s(), send_newsletter.s()
-    ).apply_async()
-
-
-@celery.task
-def joke_of_the_day_email_only_workflow():
-    chain(get_allready_created_joke_of_the_day.s(), send_newsletter.s()).apply_async()
-
-
-@celery.task
-def joke_of_the_day_full_workflow_specific(recipient_emails):
-    chain(
-        select_joke_of_the_day.s(),
-        create_joke_picture.s(),
-        send_newsletter.s(recipient_emails=recipient_emails),
-    ).apply_async()
-
-
-@celery.task
-def joke_of_the_day_email_only_workflow_specific(recipient_emails):
-    chain(
-        get_allready_created_joke_of_the_day.s(),
-        send_newsletter.s(recipient_emails=recipient_emails),
-    ).apply_async()
 
 
 @celery.task

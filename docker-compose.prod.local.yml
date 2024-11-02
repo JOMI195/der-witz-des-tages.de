@@ -132,6 +132,19 @@ services:
       timeout: 5s
       retries: 5
 
+  chrome:
+    container_name: chrome
+    image: zenika/alpine-chrome:124
+    command:
+      - "chromium-browser"
+      - "--headless"
+      - "--disable-gpu"
+      - "--remote-debugging-port=9222"
+      - "--remote-debugging-address=0.0.0.0"
+      - "--enable-features=ConversionMeasurement,AttributionReportingCrossAppWeb"
+    expose:
+      - 9222
+
 volumes:
   backend_db_data:
   umami_db_data:

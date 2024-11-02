@@ -5,9 +5,9 @@ from .models import NewsletterReciever
 
 @admin.register(NewsletterReciever)
 class NewsletterRecieverAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "is_active")
+    list_display = ("id", "email", "subscribed_at", "is_active")
     search_fields = ("email",)
-    list_filter = ("email", "subscribed_at", "is_active")
+    list_filter = ("subscribed_at", "is_active")
     list_per_page = 50
     ordering = ("subscribed_at",)
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Joke, JokeOfTheDay, JokePicture, SubmittedJoke
+from .models import Joke, JokeOfTheDay, JokePicture, ShareableImage, SubmittedJoke
 from django.utils.html import format_html
 from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
@@ -30,10 +30,24 @@ class JokeAdmin(admin.ModelAdmin):
             )
         return "No picture created yet"
 
+    def shareable_image_display(self, obj):
+        if (
+            hasattr(obj, "shareable_image")
+            and obj.shareable_image
+            and obj.shareable_image.image
+        ):
+            return format_html(
+                '<img src="{}" width="200" height="200" />',
+                obj.shareable_image.image.url,
+            )
+        return "No picture created yet"
+
     joke_picture_display.short_description = "Joke picture"
+    shareable_image_display.short_description = "Shareable Image"
 
     readonly_fields = (
         "joke_picture_display",
+        "shareable_image_display",
         "created_at",
     )
     fieldsets = (
@@ -46,6 +60,7 @@ class JokeAdmin(admin.ModelAdmin):
                     "created_by",
                     "joke_of_the_day_selection_weight",
                     "joke_picture_display",
+                    "shareable_image_display",
                 )
             },
         ),
@@ -54,7 +69,7 @@ class JokeAdmin(admin.ModelAdmin):
 
 @admin.register(JokePicture)
 class JokePictureAdmin(admin.ModelAdmin):
-    list_display = ("id", "joke", "created_at", "image")
+    list_display = ("id", "joke", "created_at")
     search_fields = ("joke__text",)
     list_filter = ("created_at",)
     ordering = ("-created_at",)
@@ -80,6 +95,40 @@ class JokePictureAdmin(admin.ModelAdmin):
                     "joke",
                     "created_at",
                     "joke_picture_display",
+                )
+            },
+        ),
+    )
+
+
+@admin.register(ShareableImage)
+class ShareableImageAdmin(admin.ModelAdmin):
+    list_display = ("id", "joke", "created_at")
+    search_fields = ("joke__text",)
+    list_filter = ("created_at",)
+    ordering = ("-created_at",)
+
+    def shareable_image_display(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" width="200" height="200" />', obj.image.url
+            )
+        return "Something went wrong - no picture"
+
+    shareable_image_display.short_description = "Joke picture"
+
+    readonly_fields = (
+        "shareable_image_display",
+        "created_at",
+    )
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "joke",
+                    "created_at",
+                    "shareable_image_display",
                 )
             },
         ),

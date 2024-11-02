@@ -20,7 +20,7 @@ class Joke(models.Model):
         return self.text[:50]
 
 
-def get_upload_path(instance, filename):
+def get_joke_picture_upload_path(instance, filename):
     ext = os.path.splitext(filename)[1]
     obfuscated_dirname = str(uuid.uuid4())
     return os.path.join(
@@ -32,7 +32,7 @@ class JokePicture(models.Model):
     joke = models.OneToOneField(
         Joke, on_delete=models.CASCADE, related_name="joke_picture"
     )
-    image = models.ImageField(upload_to=get_upload_path)
+    image = models.ImageField(upload_to=get_joke_picture_upload_path)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -61,6 +61,50 @@ class JokePicture(models.Model):
         if image_path and os.path.isfile(image_path):
             default_storage.delete(image_path)
 
+        if dir_path and os.path.exists(dir_path) and not os.listdir(dir_path):
+            os.rmdir(dir_path)
+
+
+def get_shareable_image_upload_path(instance, filename):
+    ext = os.path.splitext(filename)[1]
+    obfuscated_dirname = str(uuid.uuid4())
+    return os.path.join(
+        "shareable_images", obfuscated_dirname, f"shareable_{instance.joke.id}{ext}"
+    )
+
+
+class ShareableImage(models.Model):
+    joke = models.OneToOneField(
+        Joke, on_delete=models.CASCADE, related_name="shareable_image"
+    )
+    image = models.ImageField(upload_to=get_shareable_image_upload_path)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Shareable Image for Joke ID {self.joke.id}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                old_instance = ShareableImage.objects.get(pk=self.pk)
+                if old_instance.image != self.image:
+                    old_instance.image.delete(save=False)
+            except ShareableImage.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.image:
+            image_path = self.image.path
+            dir_path = os.path.dirname(image_path)
+        else:
+            image_path = None
+            dir_path = None
+
+        super().delete(*args, **kwargs)
+
+        if image_path and os.path.isfile(image_path):
+            default_storage.delete(image_path)
         if dir_path and os.path.exists(dir_path) and not os.listdir(dir_path):
             os.rmdir(dir_path)
 

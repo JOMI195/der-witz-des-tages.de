@@ -31,7 +31,7 @@ beat_schedule = {
 # Check for production environment
 PRODUCTION = os.environ.get("PRODUCTION", False) == "True"
 if PRODUCTION:
-    beat_schedule["create-joke-picture-send-newsletter"] = {
-        "task": "joke_newsletter.tasks.joke_of_the_day_full_workflow",
-        "schedule": crontab(hour=6, minute=0),  # Runs daily at 6 AM
+    beat_schedule["joke-of-the-day-full-workflow"] = {
+        "task": "workflows.tasks.joke_of_the_day_full_workflow",
+        "schedule": crontab(hour=5, minute=0),  # Runs daily at 5 AM
     }

@@ -39,7 +39,9 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootState = ReturnType<typeof rootReducer> & {
+  _persist: any;
+};
 
 export type AppDispatch = typeof store.dispatch & ThunkDispatch<RootState, undefined, Action>;;
 

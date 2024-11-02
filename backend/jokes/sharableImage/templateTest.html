@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            width: 1080px;
+            height: 1080px;
+        }
+
+        .container {
+            width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform: scale(2.5);
+            transform-origin: center center;
+            margin-top: -50px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1px;
+            width: fit-content;
+            height: auto;
+        }
+
+        .logo {
+            display: block;
+            width: 100px;
+            height: auto;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            margin-bottom: 15px;
+        }
+
+        .main-image-container {
+            width: 100%;
+            position: relative;
+        }
+
+        .main-image {
+            width: 280px;
+            height: 280px;
+            border-radius: 20px;
+            transform: rotate(-3deg);
+            object-fit: cover;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-card {
+            background: #D5C8F4;
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transform: rotate(2deg);
+            width: 90%;
+            margin-top: -45px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .text-content {
+            font-family: Inter;
+            font-size: larger;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img class="logo" src="data:image/jpeg;base64,{get_base64_image_from_url(logo_url)}" alt="Logo">
+        </div>
+
+        <img class="main-image" src="data:image/jpeg;base64,{get_base64_image_from_imagefield(image_field)}"
+            alt="Main content image">
+
+        <div class="text-card">
+            <p class="text-content">
+                Was sitzt ganz hinten im Brotkasten und ist beleidigt? Ein Schmollkornbrot. Was sitzt ganz hinten im
+                Brotkasten und ist beleidigt? Ein Schmollkornbrot.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

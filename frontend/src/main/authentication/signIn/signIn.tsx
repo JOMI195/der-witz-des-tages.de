@@ -188,7 +188,7 @@ export default function SignIn() {
               form="sign-in-form"
               fullWidth
               variant="contained"
-              disabled={api.submitting}
+              disabled={api.loading}
             >
               {"anmelden"}
             </Button>

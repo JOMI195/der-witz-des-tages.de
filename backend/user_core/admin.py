@@ -33,8 +33,6 @@ class UserAdmin(BaseUserAdmin):
         "is_deleted",
     )
     list_filter = (
-        "email",
-        "username",
         "is_staff",
         "is_active",
         "is_deleted",

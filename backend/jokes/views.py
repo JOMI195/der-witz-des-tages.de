@@ -2,7 +2,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from rest_framework.pagination import PageNumberPagination
-
+from django.core.files.storage import default_storage
+from jokes.joke_of_the_day.joke_of_the_day import get_latest_joke_of_the_day
+from jokes.tasks import create_shareable_image
 from config.throttles import BurstRateThrottle, SustainedRateThrottle
 
 from .models import Joke, JokeOfTheDay
@@ -132,14 +134,16 @@ class JokeViewSet(viewsets.ModelViewSet):
         permission_classes=[AllowAny],
     )
     def latest_joke_of_the_day(self, request, *args, **kwargs):
-        try:
-            latest_newsletter = JokeOfTheDay.objects.select_related("joke").latest(
-                "created_at"
+        latest_newsletter = get_latest_joke_of_the_day()
+
+        if latest_newsletter is None:
+            return Response(
+                {"detail": "No joke of the day found."},
+                status=status.HTTP_404_NOT_FOUND,
             )
-            serializer = JokeRetrieveSerializer(latest_newsletter.joke)
-            return Response(serializer.data)
-        except JokeOfTheDay.DoesNotExist:
-            return Response({"detail": "No joke of the day found."}, status=404)
+
+        serializer = JokeRetrieveSerializer(latest_newsletter.joke)
+        return Response(serializer.data)
 
     @extend_schema(
         methods=["POST"],
@@ -163,3 +167,20 @@ class JokeViewSet(viewsets.ModelViewSet):
         element = serializer.save(created_by=request.user)
         serializer = SubmittedJokeRetrieveSerializer(element)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @extend_schema(
+        methods=["POST"],
+        responses={202: {"description": "Screenshot task initiated"}},
+    )
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="take_screenshot",
+        permission_classes=[IsAuthenticated],
+    )
+    def take_screenshot(self, request, *args, **kwargs):
+        create_shareable_image.delay()
+
+        return Response(
+            {"detail": "Screenshot task initiated."}, status=status.HTTP_202_ACCEPTED
+        )

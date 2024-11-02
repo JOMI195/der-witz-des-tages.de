@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "user_accounts",
     "joke_newsletter",
     "contactMe",
+    "workflows",
 ]
 
 MIDDLEWARE = [
