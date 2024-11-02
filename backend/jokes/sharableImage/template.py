@@ -101,6 +101,7 @@ def generate_social_template(
                         font-family: Inter;
                         width: 1080px;
                         height: 1080px;
+                        overflow: hidden;
                     }}
 
                     .container {{
