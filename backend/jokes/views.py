@@ -175,8 +175,8 @@ class JokeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["post"],
-        url_path="take_screenshot",
-        permission_classes=[IsAuthenticated],
+        url_path="create_shareable_image",
+        permission_classes=[IsAdminUser],
     )
     def take_screenshot(self, request, *args, **kwargs):
         create_shareable_image.delay()

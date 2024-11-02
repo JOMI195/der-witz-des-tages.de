@@ -62,8 +62,3 @@ def create_shareable_image(*args, **kwargs):
     )
 
     return f"{shareable_image} saved to {shareable_image.image.path}"
-
-
-@celery.task
-def share_on_socials(*args, **kwargs):
-    pass

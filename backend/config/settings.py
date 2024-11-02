@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     "joke_newsletter",
     "contactMe",
     "workflows",
+    "socials_sharing",
 ]
 
 MIDDLEWARE = [
@@ -107,6 +108,14 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD", "password"),
         "HOST": os.environ.get("DB_HOST", "localhost"),
         "PORT": os.environ.get("DB_PORT", "5432"),
+    }
+}
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f'redis://{os.environ.get("REDIS_HOST", "redis")}:{os.environ.get("REDIS_PORT", "6379")}/{os.environ.get("REDIS_DB", "0")}',
     }
 }
 

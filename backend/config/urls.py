@@ -16,6 +16,7 @@ urlpatterns = [
     path("api/", include("joke_newsletter.urls")),
     path("api/", include("contactMe.urls")),
     path("api/", include("workflows.urls")),
+    path("api/", include("socials_sharing.urls")),
 ]
 
 if bool(settings.DEBUG):
