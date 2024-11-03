@@ -26,7 +26,7 @@ const persistConfig: PersistConfig<any> = {
   version: 2,
   storage,
   stateReconciler: autoMergeLevel2,
-  migrate: createMigrate(migrations, { debug: false }),
+  migrate: createMigrate(migrations, { debug: import.meta.env.VITE_APP_PRODUCTION === "False" ? true : false }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer as any);
