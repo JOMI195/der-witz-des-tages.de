@@ -38,7 +38,7 @@ services:
       - 6379:6379
     restart: always
     volumes:
-      - redis_data:/var/lib/redis/data
+      - redis_data:/data
 
   celery:
     container_name: celery
