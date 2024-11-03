@@ -13,16 +13,20 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  createMigrate,
+  PersistedState,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import rootReducer from './rootReducer';
 import autoMergeLevel2 from 'redux-persist/es/stateReconciler/autoMergeLevel2';
+import migrations from './migrations';
 
 const persistConfig: PersistConfig<any> = {
   key: 'der-witz-des-tages-data',
-  version: 1,
+  version: 2,
   storage,
   stateReconciler: autoMergeLevel2,
+  migrate: createMigrate(migrations, { debug: false }),
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer as any);
@@ -39,9 +43,7 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-export type RootState = ReturnType<typeof rootReducer> & {
-  _persist: any;
-};
+export type RootState = ReturnType<typeof rootReducer> & PersistedState;
 
 export type AppDispatch = typeof store.dispatch & ThunkDispatch<RootState, undefined, Action>;;
 
