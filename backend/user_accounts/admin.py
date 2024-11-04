@@ -6,7 +6,7 @@ from .models import Account
 class AccountAdmin(admin.ModelAdmin):
     model = Account
     list_display = ("get_user_id", "get_user_email", "recieves_newsletter")
-    list_filter = "recieves_newsletter"
+    list_filter = ("recieves_newsletter",)
     ordering = ("-user__id",)
 
     def get_user_id(self, obj):
