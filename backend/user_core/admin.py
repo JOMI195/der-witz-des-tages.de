@@ -26,17 +26,21 @@ class UserAdmin(BaseUserAdmin):
     add_form = UserCreationForm
     inlines = (AccountInline,)
     list_display = (
+        "id",
         "email",
         "username",
+        "date_joined",
         "is_staff",
         "is_active",
         "is_deleted",
     )
     list_filter = (
+        "date_joined",
         "is_staff",
         "is_active",
         "is_deleted",
     )
+    ordering = ("-date_joined",)
     readonly_fields = ("last_login", "date_joined", "is_deleted")
 
     fieldsets = (
@@ -94,7 +98,6 @@ class UserAdmin(BaseUserAdmin):
         "email",
         "username",
     )
-    ordering = ("email",)
 
     def save_model(self, request, obj, form, change):
         if not change:

@@ -9,7 +9,7 @@ class NewsletterRecieverAdmin(admin.ModelAdmin):
     search_fields = ("email",)
     list_filter = ("subscribed_at", "is_active")
     list_per_page = 50
-    ordering = ("subscribed_at",)
+    ordering = ("-subscribed_at",)
 
     readonly_fields = ("subscribed_at", "unsubscribe_token", "activation_token")
 
