@@ -16,7 +16,7 @@ services:
       backend_db:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
 
   backend_db:
     container_name: backend_db
@@ -35,19 +35,27 @@ services:
   redis:
     container_name: redis
     image: redis:6.2.11-alpine
+    command: redis-server  --appendonly yes  --appendfsync everysec  --save 60 1  --loglevel notice
     expose:
       - 6379
     restart: always
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   celery:
     <<: *backend
     container_name: celery
     command: celery -A config worker --loglevel=info -n worker1
     depends_on:
-      - redis
-      - backend
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
     entrypoint: []
     ports: []
 
@@ -56,8 +64,10 @@ services:
     container_name: celery-beat
     command: celery -A config beat
     depends_on:
-      - redis
-      - backend
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_started
     entrypoint: []
     ports: []
 
