@@ -185,7 +185,7 @@ class NewsletterRecieverViewSet(viewsets.ModelViewSet):
             )
 
 
-class JokeNewsletterViewSet(viewsets.ModelViewSet):
-    def get_permissions(self):
-        self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
+# class JokeNewsletterViewSet(viewsets.ModelViewSet):
+#     def get_permissions(self):
+#         self.permission_classes = [IsAdminUser]
+#         return super().get_permissions()
