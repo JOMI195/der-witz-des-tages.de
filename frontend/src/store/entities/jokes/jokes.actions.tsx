@@ -1,6 +1,7 @@
 import * as jokesSlice from "./jokes.slice";
 import { apiRequest } from "@/common/utils/constants/api.constants";
 import * as jokesEndpoints from "@/assets/endpoints/api/jokesEndpoints";
+import { jokesWithPicturesPaginatedPageSet } from "./jokes.slice";
 
 export const fetchJokeOfTheDay = () =>
   apiRequest({
@@ -12,7 +13,7 @@ export const fetchJokeOfTheDay = () =>
 
 export const fetchJokesWithPicturesPaginated = (
   page: number = 1,
-  page_size: number = 50
+  page_size: number = 10
 ) =>
   apiRequest({
     url: jokesEndpoints.getJokesWithPicturesPaginatedUrl(page, page_size),
@@ -30,3 +31,8 @@ export const submitJoke = (joke: string) =>
     onError: jokesSlice.jokeSubmitFailed.type,
     data: { text: joke }
   });
+
+export const setJokesWithPicturesPaginatedPage = (page: number) => ({
+  type: jokesWithPicturesPaginatedPageSet.type,
+  payload: page,
+});

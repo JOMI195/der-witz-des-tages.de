@@ -12,6 +12,8 @@ import ContentCard from '@/common/components/contentCard';
 import { Link } from 'react-router-dom';
 import { getSubmitJokeUrl } from '@/assets/endpoints/app/appEndpoints';
 import Logo from '@/common/components/logo';
+import { formatDateOnly } from '@/common/utils/date/date';
+import InstagramIcon from '@mui/icons-material/Instagram';
 
 const MEDIA_BASE_URL = import.meta.env.VITE_API_MEDIA_BASE_URL;
 
@@ -29,15 +31,6 @@ const jokeOfTheDayPictureAnimation = keyframes`
     transform: rotate(5deg) scale(1.1);
   }
 `;
-
-const getCurrentDateFormattted = () => {
-    const date = new Date();
-    return new Intl.DateTimeFormat('de-DE', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    }).format(date);
-};
 
 const Home = () => {
     const dispatch = useAppDispatch();
@@ -129,7 +122,7 @@ const Home = () => {
                         }}
                     >
                         <Typography variant="h6">
-                            {`Witz des Tages ${getCurrentDateFormattted()}`}
+                            {`Witz des Tages ${formatDateOnly(new Date())}`}
                         </Typography>
                         {jokeOfTheDay.created_by.username !== "" && (
                             <Box
@@ -162,6 +155,24 @@ const Home = () => {
                                 </Typography>
                             </Box>
                         )}
+                    </Box>
+                    <Box
+                        sx={{ my: 1, display: 'flex', justifyContent: 'center', }}
+                    >
+                        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+                            Auch auf
+                            <Button
+                                variant="outlined"
+                                startIcon={<InstagramIcon />}
+                                sx={{ mx: 1 }}
+                                component="a"
+                                href="https://www.instagram.com/der_witz_des_tages.de/"
+                                target="_blank"
+                            >
+                                Instagram
+                            </Button>
+                            verfügbar
+                        </Typography>
                     </Box>
                 </Grid>
                 <Grid item xs={12} md={7}

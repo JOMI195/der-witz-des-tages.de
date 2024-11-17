@@ -20,9 +20,9 @@ from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticated
 
 
 class JokePagination(PageNumberPagination):
-    page_size = 25
+    page_size = 10
     page_size_query_param = "page_size"
-    max_page_size = 100
+    max_page_size = 50
 
 
 class JokeViewSet(viewsets.ModelViewSet):
@@ -104,24 +104,24 @@ class JokeViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    # @extend_schema(
-    #     methods=["GET"],
-    #     responses={200: JokeRetrieveSerializer(many=True)},
-    # )
-    # @action(
-    #     detail=False,
-    #     methods=["get"],
-    #     url_path="jokes-with-pictures",
-    #     permission_classes=[AllowAny],
-    # )
-    # def jokes_with_pictures(self, request, *args, **kwargs):
-    #     jokes_with_pics = Joke.objects.filter(joke_picture__isnull=False).order_by(
-    #         "-created_at"
-    #     )
-    #     paginator = self.pagination_class()
-    #     page = paginator.paginate_queryset(jokes_with_pics, request)
-    #     serializer = JokeRetrieveSerializer(page, many=True)
-    #     return paginator.get_paginated_response(serializer.data)
+    @extend_schema(
+        methods=["GET"],
+        responses={200: JokeRetrieveSerializer(many=True)},
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="jokes-with-pictures",
+        permission_classes=[AllowAny],
+    )
+    def jokes_with_pictures(self, request, *args, **kwargs):
+        jokes_with_pics = Joke.objects.filter(joke_picture__isnull=False).order_by(
+            "-created_at"
+        )
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(jokes_with_pics, request)
+        serializer = JokeRetrieveSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     @extend_schema(
         methods=["GET"],

@@ -4,7 +4,7 @@ import NotFound from '@/common/components/error/notFound/notFound';
 import Home from '@/main/home/home';
 import { getAuthenticationUrl } from '@/assets/endpoints/app/authEndpoints';
 import Snackbars from '@/common/components/snackbars/snackbars';
-import { getContactUrl, getEnterWallUrl, getHomeUrl, getSubmitJokeUrl } from '@/assets/endpoints/app/appEndpoints';
+import { getArchiveUrl, getContactUrl, getEnterWallUrl, getHomeUrl, getSubmitJokeUrl } from '@/assets/endpoints/app/appEndpoints';
 import { getSettingsUrl } from '@/assets/endpoints/app/settingEndpoints';
 import { getNewsletterUrl } from '@/assets/endpoints/app/newsletterEndpoints';
 import SubmitJoke from '@/main/submitJoke/submitJoke';
@@ -17,6 +17,7 @@ import FeatureSelectorWrapper from '@/common/components/featureSelectorWrapper';
 import authenticationRoutes from '@/main/authentication/authentication';
 import newsletterRoutes from '@/main/newsletter/newsletter';
 import settingsRoutes from '@/main/settings/settings';
+import Archive from '@/main/archive/archive';
 
 const Routing = createBrowserRouter([
   {
@@ -50,6 +51,14 @@ const Routing = createBrowserRouter([
                 path: getHomeUrl(),
                 element: <Home />,
               },
+              {
+                path: getArchiveUrl(),
+                element: <Archive />,
+              },
+              // {
+              //   path: getArchiveUrl() + getArchiveItemUrl(),
+              //   element: <ArchiveItem />,
+              // },
               {
                 path: getContactUrl(),
                 element: <ContactForm />,

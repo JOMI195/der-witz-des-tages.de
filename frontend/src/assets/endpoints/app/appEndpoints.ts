@@ -1,6 +1,8 @@
 export const getHomeUrl = () => "/"
 
-export const getArchiveUrl = () => "archiv/"
+export const getArchiveUrl = () => "galerie/"
+
+export const getArchiveItemUrl = () => ":archive_item_id/"
 
 export const getSubmitJokeUrl = () => "witz-einreichen/"
 

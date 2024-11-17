@@ -38,12 +38,16 @@ class SubmittedJokeRetrieveSerializer(serializers.ModelSerializer):
 
 
 class JokeRetrieveSerializer(serializers.ModelSerializer):
-    joke_picture = serializers.SerializerMethodField()
     created_by = serializers.SerializerMethodField()
+    joke_picture = serializers.SerializerMethodField()
+    shareable_image = serializers.SerializerMethodField()
 
     def get_created_by(self, obj):
+        username = (
+            "jomi" if obj.created_by.username == "admin" else obj.created_by.username
+        )
         creator = {
-            "username": obj.created_by.username,
+            "username": username,
         }
         return creator
 
@@ -56,6 +60,15 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
         except Joke.joke_picture.RelatedObjectDoesNotExist:
             return None
 
+    def get_shareable_image(self, obj):
+        try:
+            return {
+                "image": obj.shareable_image.image.url,
+                "created_at": obj.shareable_image.created_at,
+            }
+        except Joke.shareable_image.RelatedObjectDoesNotExist:
+            return None
+
     class Meta:
         model = Joke
         fields = [
@@ -63,8 +76,8 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
             "text",
             "created_at",
             "created_by",
-            "joke_of_the_day_selection_weight",
             "joke_picture",
+            "shareable_image",
         ]
 
 

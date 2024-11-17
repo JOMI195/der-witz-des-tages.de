@@ -5,11 +5,16 @@ export interface IJoke {
     created_by: {
         username: string;
     }
-    joke_of_the_day_selection_weight: number;
     joke_picture: IJokePicture | null;
+    shareable_image: IShareableImage | null;
 }
 
 export interface IJokePicture {
+    image: string;
+    created_at: string;
+}
+
+export interface IShareableImage {
     image: string;
     created_at: string;
 }

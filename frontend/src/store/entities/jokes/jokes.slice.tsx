@@ -24,7 +24,7 @@ const initialState: SliceState = {
       username: "",
     },
     joke_picture: null,
-    joke_of_the_day_selection_weight: 1
+    shareable_image: null,
   },
   jokes_with_pictures_paginated: {
     count: 0,
