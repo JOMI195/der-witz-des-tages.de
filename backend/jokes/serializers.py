@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Joke, JokePicture, SubmittedJoke
+from .models import Joke, JokeOfTheDay, JokePicture, SubmittedJoke
 
 
 class JokePictureSerializer(serializers.ModelSerializer):
@@ -41,6 +41,7 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
     created_by = serializers.SerializerMethodField()
     joke_picture = serializers.SerializerMethodField()
     shareable_image = serializers.SerializerMethodField()
+    joke_of_the_day_created_at = serializers.SerializerMethodField()
 
     def get_created_by(self, obj):
         username = (
@@ -69,6 +70,12 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
         except Joke.shareable_image.RelatedObjectDoesNotExist:
             return None
 
+    def get_joke_of_the_day_created_at(self, obj):
+        try:
+            return obj.joke_of_the_day.first().created_at
+        except AttributeError:
+            return None
+
     class Meta:
         model = Joke
         fields = [
@@ -78,6 +85,7 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
             "created_by",
             "joke_picture",
             "shareable_image",
+            "joke_of_the_day_created_at",
         ]
 
 

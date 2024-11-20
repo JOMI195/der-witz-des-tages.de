@@ -111,17 +111,38 @@ class JokeViewSet(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=["get"],
-        url_path="jokes-with-pictures",
+        url_path="joke-of-the-days",
         permission_classes=[AllowAny],
     )
-    def jokes_with_pictures(self, request, *args, **kwargs):
-        jokes_with_pics = Joke.objects.filter(joke_picture__isnull=False).order_by(
-            "-created_at"
-        )
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(jokes_with_pics, request)
-        serializer = JokeRetrieveSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def joke_of_the_days(self, request, *args, **kwargs):
+        try:
+            jokes = (
+                Joke.objects.filter(
+                    joke_of_the_day__isnull=False,  # Has been joke of the day
+                    joke_picture__isnull=False,  # Has a picture
+                )
+                .select_related("created_by", "joke_picture", "shareable_image")
+                .prefetch_related("joke_of_the_day")  # Optimize by pre-fetching
+                .order_by("-joke_of_the_day__created_at")  # Most recent jokes first
+            )
+
+            if not jokes.exists():
+                return Response(
+                    {"detail": "No jokes of the day with pictures found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(jokes, request)
+            serializer = JokeRetrieveSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        except Exception as e:
+            return Response(
+                # {"detail": f"Error retrieving jokes: {str(e)}"},
+                {"detail": f"Error retrieving jokes"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     @extend_schema(
         methods=["GET"],

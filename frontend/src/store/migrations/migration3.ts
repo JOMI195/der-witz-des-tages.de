@@ -16,6 +16,7 @@ const migration3 = (state: RootState): RootState => {
           },
           joke_picture: null,
           shareable_image: null,
+          joke_of_the_day_created_at: null,
         },
       },
     },

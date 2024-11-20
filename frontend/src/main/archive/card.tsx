@@ -89,15 +89,17 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                     boxShadow: 2,
                     marginTop: '-30px',
                     zIndex: 1,
-                    height: 120,
+                    minHeight: 120,
                     display: "flex",
                     flexDirection: "column"
                 }}
             >
                 <Typography color={"black"} variant="body1" sx={{ flexGrow: 1 }}>{joke.text}</Typography>
-                <Typography color={"black"} variant="caption" sx={{ textAlign: 'center' }}>
-                    {formatDateOnly(joke.created_at)}
-                </Typography>
+                {joke.joke_of_the_day_created_at && (
+                    <Typography color={"black"} variant="caption" sx={{ textAlign: 'center', mt: 1 }}>
+                        {formatDateOnly(joke.joke_of_the_day_created_at)}
+                    </Typography>
+                )}
             </Box>
         </Box>
     );

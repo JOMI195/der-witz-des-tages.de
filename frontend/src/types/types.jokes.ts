@@ -7,6 +7,7 @@ export interface IJoke {
     }
     joke_picture: IJokePicture | null;
     shareable_image: IShareableImage | null;
+    joke_of_the_day_created_at: string | null;
 }
 
 export interface IJokePicture {
