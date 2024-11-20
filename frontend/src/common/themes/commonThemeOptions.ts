@@ -36,7 +36,7 @@ declare module "@mui/material/styles" {
 export const commonThemeOptions = {
   typography: {
     fontFamily: [
-      "Inter, sans-serif",
+      "Inter",
     ].join(','),
   },
   shape: {
