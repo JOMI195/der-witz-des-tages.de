@@ -105,7 +105,7 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                             textWrap: "stable"
                         }}
                     >
-                        <Typography variant="caption">
+                        <Typography color={"black"} variant="caption">
                             {"Eingereicht von"}
                         </Typography>
                         <Avatar
@@ -114,12 +114,13 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                                 height: 5,
                                 p: 1.5,
                                 mx: 1,
+                                color: "white"
                             }}
                             alt="Account"
                         >
                             {`${joke.created_by.username === "admin" ? "jomi".slice(0, 1).toUpperCase() : joke.created_by.username.slice(0, 1).toUpperCase()}`}
                         </Avatar>
-                        <Typography variant="body2">
+                        <Typography color={"black"} variant="body2">
                             {
                                 `${joke.created_by.username === "admin" ? "jomi" : joke.created_by.username}`
                             }
