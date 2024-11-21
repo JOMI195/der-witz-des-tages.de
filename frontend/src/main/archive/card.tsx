@@ -1,6 +1,6 @@
 import { formatDateOnly } from "@/common/utils/date/date";
 import { IJoke } from "@/types";
-import { Box, CardMedia, Typography } from "@mui/material";
+import { Avatar, Box, CardMedia, Typography } from "@mui/material";
 
 
 const MEDIA_BASE_URL = import.meta.env.VITE_API_MEDIA_BASE_URL;
@@ -95,6 +95,37 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                 }}
             >
                 <Typography color={"black"} variant="body1" sx={{ flexGrow: 1 }}>{joke.text}</Typography>
+                {joke.created_by.username !== "" && (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            mt: 2,
+                            textWrap: "stable"
+                        }}
+                    >
+                        <Typography variant="caption">
+                            {"Eingereicht von"}
+                        </Typography>
+                        <Avatar
+                            sx={{
+                                width: 5,
+                                height: 5,
+                                p: 1.5,
+                                mx: 1,
+                            }}
+                            alt="Account"
+                        >
+                            {`${joke.created_by.username === "admin" ? "jomi".slice(0, 1).toUpperCase() : joke.created_by.username.slice(0, 1).toUpperCase()}`}
+                        </Avatar>
+                        <Typography variant="body2">
+                            {
+                                `${joke.created_by.username === "admin" ? "jomi" : joke.created_by.username}`
+                            }
+                        </Typography>
+                    </Box>
+                )}
                 {joke.joke_of_the_day_created_at && (
                     <Typography color={"black"} variant="caption" sx={{ textAlign: 'center', mt: 1 }}>
                         {formatDateOnly(joke.joke_of_the_day_created_at)}

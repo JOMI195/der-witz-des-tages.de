@@ -132,9 +132,13 @@ const Home = () => {
                                     alignItems: "center",
                                 }}
                             >
-                                {!isMobile && (
+                                {!isMobile ? (
                                     <Typography sx={{ pl: 1 }} variant="h6">
-                                        {"-"}
+                                        {"- Eingereicht von"}
+                                    </Typography>
+                                ) : (
+                                    <Typography variant={"body2"}>
+                                        {"Eingereicht von"}
                                     </Typography>
                                 )}
                                 <Avatar
