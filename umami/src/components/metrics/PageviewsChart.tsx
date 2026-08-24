@@ -23,7 +23,7 @@ export function PagepageviewsChart({ data, unit, isLoading, ...props }: Pagepage
 
   const chartData = useMemo(() => {
     if (!data) {
-      return {};
+      return { datasets: [] };
     }
 
     return {

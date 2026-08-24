@@ -20,7 +20,7 @@ export function EventsChart({ websiteId, className }: EventsChartProps) {
   const { data, isLoading } = useWebsiteEvents(websiteId);
 
   const chartData = useMemo(() => {
-    if (!data) return [];
+    if (!data) return { datasets: [] };
 
     const map = (data as any[]).reduce((obj, { x, t, y }) => {
       if (!obj[x]) {

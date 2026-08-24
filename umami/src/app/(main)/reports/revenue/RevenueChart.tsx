@@ -19,7 +19,7 @@ export function RevenueChart({ isLoading, ...props }: PageviewsChartProps) {
 
   const chartData = useMemo(() => {
     if (!data) {
-      return {};
+      return { datasets: [] };
     }
 
     return {

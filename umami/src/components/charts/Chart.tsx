@@ -104,7 +104,9 @@ export function Chart({
   };
 
   useEffect(() => {
-    if (data) {
+    // Consumers return a datasets-less value while their query has no data,
+    // and createChart/updateChart both dereference data.datasets.
+    if ((data as any)?.datasets) {
       if (!chart.current) {
         createChart(data);
       } else {

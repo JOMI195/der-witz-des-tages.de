@@ -43,3 +43,22 @@ else
   # Run the command on the specified container
   docker compose -f "$DOCKER_COMPOSE_FILE" --env-file "$ENV_FILE" $DOCKER_COMPOSE_COMMAND "$CONTAINER_NAME"
 fi
+
+RESULT=$?
+
+# A rebuilt nginx image ships an index.html without the tracker, so re-inject
+# after every `up` of the full stack.
+INJECT_SCRIPT="$(dirname "$0")/scripts/inject-umami-tracker.sh"
+if [ "$RESULT" -eq 0 ] && [ "$CONTAINER_NAME" == "all" ] \
+   && [ "$(echo "$DOCKER_COMPOSE_COMMAND" | awk '{print $1}')" == "up" ] \
+   && grep -q "^  umami:" "$DOCKER_COMPOSE_FILE" \
+   && grep -q "^  nginx:" "$DOCKER_COMPOSE_FILE"; then
+  if [ -x "$INJECT_SCRIPT" ]; then
+    "$INJECT_SCRIPT" "$DOCKER_COMPOSE_FILE" "$ENV_FILE" \
+      || echo "Warning: umami tracker injection failed!"
+  else
+    echo "Warning: '$INJECT_SCRIPT' not found or not executable, skipping tracker injection!"
+  fi
+fi
+
+exit $RESULT

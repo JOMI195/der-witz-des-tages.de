@@ -101,7 +101,7 @@ services:
       BASE_PATH: ${UMAMI_BASE_PATH}
       DATABASE_TYPE: ${UMAMI_DATABASE_TYPE}
       TRACKER_SCRIPT_NAME: ${UMAMI_TRACKER_SCRIPT_NAME}
-      API_COLLECT_ENDPOINT: ${UMAMI_API_COLLECT_ENDPOINT}
+      COLLECT_API_ENDPOINT: ${UMAMI_COLLECT_API_ENDPOINT}
       #FORCE_SSL: ${UMAMI_FORCE_SSL}
     depends_on:
       umami_db:
@@ -112,7 +112,7 @@ services:
       - 3000
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:3000/analytics/api/heartbeat" ]
+      test: [ "CMD-SHELL", "curl -f http://127.0.0.1:3000/api/heartbeat" ]
       interval: 5s
       timeout: 5s
       retries: 5

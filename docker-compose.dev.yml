@@ -78,7 +78,7 @@ services:
     image: ghcr.io/umami-software/umami:postgresql-v2.12.1
     environment:
       TRACKER_SCRIPT_NAME: getinfo
-      API_COLLECT_ENDPOINT: all
+      COLLECT_API_ENDPOINT: /all
       APP_SECRET: ${UMAMI_APP_SECRET}
       DATABASE_URL: ${UMAMI_DATABASE_URL}
     depends_on:

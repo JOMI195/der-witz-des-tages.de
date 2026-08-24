@@ -194,3 +194,6 @@ umami_db_data/
 
 # app related 
 .recievers.txt
+
+# AI
+CLAUDE.md
