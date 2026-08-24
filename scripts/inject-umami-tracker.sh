@@ -149,11 +149,18 @@ SNIPPET="  <!-- umami:start -->
 printf '%s\n' "$SNIPPET" | docker exec -i "$NGINX_CID" sh -c 'cat > /tmp/umami-snippet.html'
 
 # Delete before insert so reruns stay idempotent and a changed id is picked up.
+# The second sed also strips tracker tags added outside these markers (e.g. an
+# older hand-placed snippet), which would otherwise survive as a duplicate.
 # Kept busybox-safe: no GNU-only sed commands.
 docker exec "$NGINX_CID" sh -c '
   set -e
   f=/usr/share/nginx/html/index.html
   sed -i "/<!-- umami:start -->/,/<!-- umami:end -->/d" "$f"
+  stray=$(grep -c "data-website-id" "$f" || true)
+  if [ "$stray" -gt 0 ]; then
+    echo "    removing $stray tracker tag(s) found outside the markers"
+    sed -i "s|<script[^>]*data-website-id[^>]*></script>||g" "$f"
+  fi
   awk "/<\/head>/ { while ((getline l < \"/tmp/umami-snippet.html\") > 0) print l } { print }" \
       "$f" > "$f.new"
   mv "$f.new" "$f"
