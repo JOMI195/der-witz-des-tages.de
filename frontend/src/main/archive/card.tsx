@@ -1,9 +1,8 @@
 import { formatDateOnly } from "@/common/utils/date/date";
 import { IJoke } from "@/types";
 import { Avatar, Box, CardMedia, Typography } from "@mui/material";
+import { jokeImageSources } from "@/common/utils/image/jokeImage";
 
-
-const MEDIA_BASE_URL = import.meta.env.VITE_API_MEDIA_BASE_URL;
 
 const getRandomRotations = (): [number, number] => {
     /**
@@ -67,8 +66,13 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                 >
                     <CardMedia
                         component="img"
-                        image={MEDIA_BASE_URL + joke.joke_picture.image}
-                        alt="joke image"
+                        {...jokeImageSources(joke.joke_picture)}
+                        sizes="(max-width: 600px) 90vw, (max-width: 900px) 45vw, 30vw"
+                        width={400}
+                        height={400}
+                        loading="lazy"
+                        decoding="async"
+                        alt={`Illustration zum Witz: ${joke.text}`}
                         sx={{
                             width: '85%',
                             aspectRatio: '1 / 1',
@@ -116,7 +120,7 @@ const JokeCard: React.FC<IJokeCardProps> = ({ joke }) => {
                                 mx: 1,
                                 color: "white"
                             }}
-                            alt="Account"
+                            alt={joke.created_by.username === "admin" ? "jomi" : joke.created_by.username}
                         >
                             {`${joke.created_by.username === "admin" ? "jomi".slice(0, 1).toUpperCase() : joke.created_by.username.slice(0, 1).toUpperCase()}`}
                         </Avatar>

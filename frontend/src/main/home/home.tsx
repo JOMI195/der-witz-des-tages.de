@@ -14,8 +14,7 @@ import { getSubmitJokeUrl } from '@/assets/endpoints/app/appEndpoints';
 import Logo from '@/common/components/logo';
 import { formatDateOnly } from '@/common/utils/date/date';
 import InstagramIcon from '@mui/icons-material/Instagram';
-
-const MEDIA_BASE_URL = import.meta.env.VITE_API_MEDIA_BASE_URL;
+import { jokeImageSources } from '@/common/utils/image/jokeImage';
 
 const getRandomCatchPhrase = () => {
     const randomIndex = Math.floor(Math.random() * landingPageCatchPhrases.length);
@@ -97,6 +96,7 @@ const Home = () => {
                         <TextGradient
                             options={{
                                 variant: isMobile ? 'h2' : 'h1',
+                                component: 'h1',
                                 direction: 'to bottom right',
                                 startColor: theme.palette.accent.main,
                                 endColor: theme.palette.primary.main,
@@ -108,7 +108,9 @@ const Home = () => {
                             {jokeOfTheDay?.text || catchPhrase}
                         </TextGradient>
                     ) : (
-                        <Box sx={{ pb: 1, }}>
+                        // still an h1 while loading: the page must never be
+                        // without one, in any render state
+                        <Box component="h1" sx={{ pb: 1, m: 0 }}>
                             <Typography variant="h2">{<Skeleton />}</Typography>
                             <Typography variant="h2">{<Skeleton />}</Typography>
                         </Box>
@@ -121,7 +123,7 @@ const Home = () => {
                             flexDirection: isMobile ? "column" : "row"
                         }}
                     >
-                        <Typography variant="h6">
+                        <Typography variant="h6" component="h2">
                             {`Witz des Tages ${formatDateOnly(new Date())}`}
                         </Typography>
                         {jokeOfTheDay.created_by.username !== "" && (
@@ -148,7 +150,7 @@ const Home = () => {
                                         p: 1.5,
                                         mx: 1,
                                     }}
-                                    alt="Account"
+                                    alt={jokeOfTheDay.created_by.username === "admin" ? "jomi" : jokeOfTheDay.created_by.username}
                                 >
                                     {`${jokeOfTheDay.created_by.username === "admin" ? "jomi".slice(0, 1).toUpperCase() : jokeOfTheDay.created_by.username.slice(0, 1).toUpperCase()}`}
                                 </Avatar>
@@ -172,6 +174,7 @@ const Home = () => {
                                 component="a"
                                 href="https://www.instagram.com/der_witz_des_tages.de/"
                                 target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 Instagram
                             </Button>
@@ -228,11 +231,19 @@ const Home = () => {
                         {jokeOfTheDay.joke_picture !== null ? (
                             <CardMedia
                                 component="img"
-                                image={MEDIA_BASE_URL + jokeOfTheDay.joke_picture.image}
-                                alt="Joke of the day"
+                                {...jokeImageSources(jokeOfTheDay.joke_picture)}
+                                sizes={isMobile ? "300px" : "600px"}
+                                width={800}
+                                height={800}
+                                loading="eager"
+                                fetchPriority="high"
+                                decoding="async"
+                                alt={jokeOfTheDay.text ? `Illustration zum Witz: ${jokeOfTheDay.text}` : "Illustration zum Witz des Tages"}
                                 sx={{
                                     objectFit: 'cover',
                                     flexGrow: 1,
+                                    width: '100%',
+                                    height: 'auto',
                                 }}
                             />
                         ) : (

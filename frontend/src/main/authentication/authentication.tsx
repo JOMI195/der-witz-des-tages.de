@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components -- route config module, the lazy() consts are routes, not exported components */
+import { lazy } from "react";
 import {
   getActivationUrl,
   getResetPasswordConfirmationUrl,
@@ -8,15 +10,16 @@ import {
   getSignUpUrl,
   getUsersUrl,
 } from "@/assets/endpoints/app/authEndpoints";
-import Layout from "./layout";
-import SignIn from "./signIn/signIn";
-import SignOut from "./signOut/signOut";
-import SignUp from "./signUp/signUp";
-import Activation from "./users/activation";
-import PasswordReset from "./users/passwordReset";
-import PasswordResetConfirmation from "./users/passwordResetConfirmation";
-import SignUpConfirmation from "./signUp/signUpConfirmation";
 import NotFound from "@/common/components/error/notFound/notFound";
+
+const Layout = lazy(() => import("./layout"));
+const SignIn = lazy(() => import("./signIn/signIn"));
+const SignOut = lazy(() => import("./signOut/signOut"));
+const SignUp = lazy(() => import("./signUp/signUp"));
+const Activation = lazy(() => import("./users/activation"));
+const PasswordReset = lazy(() => import("./users/passwordReset"));
+const PasswordResetConfirmation = lazy(() => import("./users/passwordResetConfirmation"));
+const SignUpConfirmation = lazy(() => import("./signUp/signUpConfirmation"));
 
 const authenticationRoutes = [
   {

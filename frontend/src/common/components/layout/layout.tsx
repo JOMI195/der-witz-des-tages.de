@@ -19,6 +19,7 @@ const MainLayout: React.FC = () => {
             <ScrollRestoration />
             <SignUpOptionsDialog />
             <Container
+                component="main"
                 maxWidth="xl"
                 sx={{
                     flex: '1 1 auto',

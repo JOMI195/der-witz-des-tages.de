@@ -20,6 +20,7 @@ import {
     Button,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import JokeCard from './card';
 
 const Archive = () => {
@@ -29,15 +30,31 @@ const Archive = () => {
     const paginatedJokes: IJokesWithPicturesPaginated = useAppSelector(getJokesWithPicturesPaginated);
     const jokesApiLoading = useAppSelector(getApi).loading;
 
+    const [searchParams, setSearchParams] = useSearchParams();
     const [pageSize, setPageSize] = useState(10);
     const [filterText, setFilterText] = useState('');
 
+    // The page lives in the URL so every gallery page is a crawlable, shareable address.
+    const page = Math.max(1, Number(searchParams.get('page')) || 1);
+
     useEffect(() => {
-        dispatch(fetchJokesWithPicturesPaginated(paginatedJokes.page, pageSize));
-    }, [dispatch, paginatedJokes.page, pageSize]);
+        if (paginatedJokes.page !== page) {
+            dispatch(setJokesWithPicturesPaginatedPage(page));
+        }
+    }, [dispatch, page, paginatedJokes.page]);
+
+    useEffect(() => {
+        dispatch(fetchJokesWithPicturesPaginated(page, pageSize));
+    }, [dispatch, page, pageSize]);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-        dispatch(setJokesWithPicturesPaginatedPage(value));
+        const params = new URLSearchParams(searchParams);
+        if (value > 1) {
+            params.set('page', String(value));
+        } else {
+            params.delete('page');
+        }
+        setSearchParams(params);
     };
 
     const handleFilterTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +64,10 @@ const Archive = () => {
     const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newPageSize = parseInt(event.target.value);
         setPageSize(newPageSize);
+
+        const params = new URLSearchParams(searchParams);
+        params.delete('page');
+        setSearchParams(params);
     };
 
     const filteredJokes = paginatedJokes.results.filter((joke) => {
@@ -58,7 +79,9 @@ const Archive = () => {
 
     return (
         <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Typography variant={"h1"} fontWeight={"bold"} sx={{ mb: isMobile ? 3 : 5, }}>Witze Galerie 🗄️</Typography>
+            <Typography variant={"h1"} fontWeight={"bold"} sx={{ mb: isMobile ? 3 : 5, }}>
+                {page > 1 ? `Witze Galerie 🗄️ – Seite ${page}` : 'Witze Galerie 🗄️'}
+            </Typography>
             <Box
                 sx={{ mb: isMobile ? 3 : 5, }}
             >
@@ -71,6 +94,7 @@ const Archive = () => {
                         component="a"
                         href="https://www.instagram.com/der_witz_des_tages.de/"
                         target="_blank"
+                        rel="noopener noreferrer"
                     >
                         Instagram
                     </Button>
@@ -176,13 +200,13 @@ const Archive = () => {
 
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
                 <Pagination
-                    showFirstButton={paginatedJokes.page > 1}
-                    showLastButton={paginatedJokes.page < totalPages}
+                    showFirstButton={page > 1}
+                    showLastButton={page < totalPages}
                     count={totalPages}
-                    page={paginatedJokes.page}
+                    page={page}
                     onChange={handlePageChange}
                     color="primary"
-                    disabled={paginatedJokes.page === 1 && !paginatedJokes.next}
+                    disabled={page === 1 && !paginatedJokes.next}
                 />
             </Box>
         </Container>

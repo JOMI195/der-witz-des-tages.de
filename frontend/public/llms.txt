@@ -1,0 +1,25 @@
+# Der Witz des Tages
+
+> Täglich ein neuer deutscher Flachwitz mit passendem KI-generierten Bild – kostenlos auf der Website und als E-Mail-Newsletter.
+
+Der Witz des Tages veröffentlicht jeden Morgen um 5 Uhr (Europe/Berlin) einen neuen Witz des Tages.
+Jeder Witz bekommt ein automatisch generiertes Bild und wird zusätzlich per Newsletter und auf Instagram geteilt.
+Witze werden von der Community eingereicht und redaktionell freigegeben.
+
+## Seiten
+
+- [Startseite](https://www.der-witz-des-tages.de/): der aktuelle Witz des Tages mit Bild, Datum und Einreicher sowie die Newsletter-Anmeldung.
+- [Witze Galerie](https://www.der-witz-des-tages.de/galerie/): Archiv aller bisherigen Witze des Tages mit Bildern, seitenweise unter `?page=N`.
+- [Witz einreichen](https://www.der-witz-des-tages.de/witz-einreichen/): eigene Witze einreichen (Konto erforderlich).
+- [Kontakt](https://www.der-witz-des-tages.de/kontakt/): Kontaktformular.
+
+## API
+
+- `GET https://www.der-witz-des-tages.de/api/jokes/latest-joke-of-the-day/`: aktueller Witz des Tages als JSON.
+- `GET https://www.der-witz-des-tages.de/api/jokes/joke-of-the-days/?page=1&page_size=50`: paginiertes Archiv der Witze des Tages.
+
+## Optional
+
+- Sprache: Deutsch (de-DE). Inhalte sind humoristisch und nicht als Fakten gemeint.
+- Bilder liegen unter `/api/media/joke_pictures/` in den Breiten 400 px und 800 px (WebP) sowie 800 px (JPEG).
+- Kontakt: info@der-witz-des-tages.de

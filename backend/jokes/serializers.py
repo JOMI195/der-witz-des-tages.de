@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Joke, JokeOfTheDay, JokePicture, SubmittedJoke
+from jokes.joke_picture.variants import variant_urls
 
 
 class JokePictureSerializer(serializers.ModelSerializer):
@@ -57,6 +58,7 @@ class JokeRetrieveSerializer(serializers.ModelSerializer):
             return {
                 "image": obj.joke_picture.image.url,
                 "created_at": obj.joke_picture.created_at,
+                "variants": variant_urls(obj.joke_picture.image),
             }
         except Joke.joke_picture.RelatedObjectDoesNotExist:
             return None

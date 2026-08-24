@@ -8,6 +8,7 @@ from jokes.tasks import (
 )
 from joke_newsletter.tasks import send_newsletter
 from socials_sharing.tasks import share_on_socials
+from seo.tasks import render_seo_pages
 
 
 @celery.task
@@ -17,6 +18,7 @@ def joke_of_the_day_full_workflow():
         create_joke_picture.s(),
         send_newsletter.s(),
         create_shareable_image.s(),
+        render_seo_pages.s(),
         share_on_socials.s(),
     ).apply_async()
 

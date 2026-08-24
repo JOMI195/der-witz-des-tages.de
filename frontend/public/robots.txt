@@ -1,9 +1,13 @@
 User-agent: *
 Disallow: /api
 Disallow: /api?*
-Disallow: /settings
-Disallow: /settings?*
 Disallow: /auth
 Disallow: /auth?*
+Disallow: /settings
+Disallow: /settings?*
+Disallow: /joke-newsletter
+Disallow: /joke-newsletter?*
+Disallow: /comingSoon
+Disallow: /comingSoon?*
 
 Sitemap: https://www.der-witz-des-tages.de/sitemap.xml

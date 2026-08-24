@@ -8,6 +8,7 @@ from celery.exceptions import SoftTimeLimitExceeded
 import os
 from django.core.exceptions import ObjectDoesNotExist
 from appEmail.tasks import send_django_mail_with_logo
+from jokes.joke_picture.variants import email_variant_path
 from jokes.models import Joke, JokePicture
 from .models import NewsletterReciever
 from config.celery import celery
@@ -83,7 +84,9 @@ def send_newsletter(joke_data, recipient_emails=None, batch_delay=5):
                     to_email=subscriber.email,
                     images=[
                         {
-                            "path": joke_picture.image.path,
+                            # 800px JPEG instead of the full size original: the
+                            # image is attached once per recipient
+                            "path": email_variant_path(joke_picture.image),
                             "cid": "joke_image",
                             "template_identifier": "joke_image_cid",
                             "filename": "witz-des-tages-illustration.jpg",

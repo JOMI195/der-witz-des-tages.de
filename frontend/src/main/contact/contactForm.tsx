@@ -69,7 +69,7 @@ export default function ContactForm() {
                 }}
             >
                 <Grid item xs={12} lg={7}>
-                    <Typography variant="h2">
+                    <Typography variant="h2" component="h1">
                         Kontaktiere uns
                     </Typography>
                 </Grid>

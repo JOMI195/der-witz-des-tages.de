@@ -26,6 +26,12 @@ beat_schedule = {
         "task": "joke_newsletter.tasks.delete_inactive_newsletter_recipients",
         "schedule": crontab(minute=0, hour=0),  # Runs daily at midnight
     },
+    # Also picks up a fresh deployment: nginx writes a new template.html with
+    # the new asset hashes, which the render has to be rebuilt from.
+    "render-seo-pages-every-30-minutes": {
+        "task": "seo.tasks.render_seo_pages",
+        "schedule": timedelta(minutes=30),
+    },
 }
 
 # Check for production environment

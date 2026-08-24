@@ -1,7 +1,7 @@
 {
-    "name": "der-witz-des-tages",
-    "short_name": "der-witz-des-tages",
-    "description": "Erhalte jede Tag einen neuen Flachwitz als Newsletter und auf www.der-witz-des-tages.de",
+    "name": "Der Witz des Tages",
+    "short_name": "Witz des Tages",
+    "description": "Täglich ein neuer Flachwitz mit passendem Bild - kostenlos auf der Website und als Newsletter.",
     "icons": [
         {
             "src": "/android-chrome-192x192.png?v=1",
@@ -18,5 +18,6 @@
     "background_color": "#ffffff",
     "display": "standalone",
     "start_url": "/",
-    "lang": "de"
+    "lang": "de",
+    "scope": "/"
 }

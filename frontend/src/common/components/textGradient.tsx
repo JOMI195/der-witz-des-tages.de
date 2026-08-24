@@ -4,6 +4,7 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 interface GradientOptions {
     variant?: TypographyProps['variant'];
+    component?: React.ElementType;
     textAlign?: TypographyProps['align'];
     direction: 'to top' | 'to bottom' | 'to left' | 'to right' | 'to top right' | 'to bottom right' | 'to top left' | 'to bottom left';
     startColor: string;
@@ -20,6 +21,7 @@ const TextGradient: React.FC<TextGradientProps> = ({ options, children, sx }) =>
     return (
         <Typography
             variant={options.variant}
+            {...(options.component ? { component: options.component } : {})}
             align={options.textAlign}
             sx={{
                 backgroundImage: `linear-gradient(${options.direction}, ${options.startColor}, ${options.endColor})`,

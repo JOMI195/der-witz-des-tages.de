@@ -1,8 +1,11 @@
+/* eslint-disable react-refresh/only-export-components -- route config module, the lazy() consts are routes, not exported components */
+import { lazy } from "react";
 import NotFound from "@/common/components/error/notFound/notFound";
-import Layout from "../authentication/layout"; // Assuming the layout is shared with authentication
 import { getNewsletterActivationUrl, getNewsletterUnsubscribeUrl } from "@/assets/endpoints/app/newsletterEndpoints";
-import Activation from "./activate";
-import Unsubscribtion from "./unsubscribe";
+
+const Layout = lazy(() => import("../authentication/layout"));
+const Activation = lazy(() => import("./activate"));
+const Unsubscribtion = lazy(() => import("./unsubscribe"));
 
 const newsletterRoutes = [
     {

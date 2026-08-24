@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "contactMe",
     "workflows",
     "socials_sharing",
+    "seo",
 ]
 
 MIDDLEWARE = [
@@ -161,6 +162,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/api/media/"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 
+# Prerendered, crawlable HTML written by the seo app and served by nginx.
+# The directory is a volume shared with the nginx container.
+SEO_DIR = BASE_DIR / "seofiles"
+SITE_ORIGIN = os.environ.get("DOMAIN", "https://www.der-witz-des-tages.de")
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -185,6 +191,10 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {"burst": "60/min", "sustained": "1000/day"},
 }
+
+if not DEBUG:
+    # No browsable API in production: it serves crawlable HTML for every endpoint
+    REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] = ("rest_framework.renderers.JSONRenderer",)
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=10),

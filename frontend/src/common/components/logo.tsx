@@ -29,7 +29,7 @@ const Logo: React.FC<LogoProps> = ({
         <Link to={homeUrl} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>
             <img
                 src={logoSrc}
-                alt="Logo"
+                alt="Der Witz des Tages"
                 style={{
                     width: '100%',
                     maxWidth,
@@ -41,7 +41,7 @@ const Logo: React.FC<LogoProps> = ({
     ) : (
         <img
             src={logoSrc}
-            alt="Logo"
+            alt="Der Witz des Tages"
             style={{
                 width: '100%',
                 maxWidth,

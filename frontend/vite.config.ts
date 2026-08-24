@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import compression from 'vite-plugin-compression2';
+import prerenderPlugin from './vite/prerenderPlugin';
 
 const envDir = path.resolve(__dirname, '../');
 
@@ -15,6 +16,12 @@ export default defineConfig(({ mode }) => {
         include: /\.(js|css|html|svg|json|txt|ico|xml)$/,
         deleteOriginalAssets: false,
       }),
+      compression({
+        algorithm: 'gzip',
+        include: /\.(js|css|html|svg|json|txt|ico|xml)$/,
+        deleteOriginalAssets: false,
+      }),
+      prerenderPlugin(),
     ],
     server: {
       host: true,
@@ -26,7 +33,16 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: './build',
       emptyOutDir: true,
-      sourcemap: false
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom', 'react-router-dom'],
+            mui: ['@mui/material', '@emotion/react', '@emotion/styled'],
+            redux: ['@reduxjs/toolkit', 'react-redux', 'redux-persist'],
+          },
+        },
+      },
     },
     resolve: {
       alias: {

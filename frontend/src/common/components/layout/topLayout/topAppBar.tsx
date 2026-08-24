@@ -105,7 +105,7 @@ function TopAppBar() {
                         <Grid display={{ xs: "flex", md: "none" }} item xs={8} alignItems="center" justifyContent="flex-start">
                             <IconButton
                                 size="small"
-                                aria-label="account of current user"
+                                aria-label="Navigationsmenü öffnen"
                                 aria-controls="menu-appbar"
                                 aria-haspopup="true"
                                 onClick={handleOpenNavMenu}
@@ -167,23 +167,33 @@ function TopAppBar() {
                                 }}
                             />
                             <Tooltip title={colorMode === "dark" ? "Wechsel in den hellen Modus" : "Wechsel in den dunklen Modus"}>
-                                <IconButton size={isSmallScreen ? "medium" : "medium"} onClick={toggleColorMode} sx={{ p: 1 }}>
+                                <IconButton
+                                    size={isSmallScreen ? "medium" : "medium"}
+                                    onClick={toggleColorMode}
+                                    aria-label={colorMode === "dark" ? "In den hellen Modus wechseln" : "In den dunklen Modus wechseln"}
+                                    sx={{ p: 1 }}
+                                >
                                     <IconComponent fontSize={isSmallScreen ? "medium" : "medium"} />
                                 </IconButton>
                             </Tooltip>
-                            <IconButton size={isSmallScreen ? "medium" : "medium"} onClick={handleSettingsClick} sx={{ p: 1 }}>
+                            <IconButton
+                                size={isSmallScreen ? "medium" : "medium"}
+                                onClick={handleSettingsClick}
+                                aria-label="Einstellungen öffnen"
+                                sx={{ p: 1 }}
+                            >
                                 <SettingsIcon fontSize={isSmallScreen ? "medium" : "medium"} />
                             </IconButton>
                             {user.loggedIn ? (
                                 <Box>
-                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 1 }}>
+                                    <IconButton onClick={handleOpenUserMenu} aria-label="Kontomenü öffnen" sx={{ p: 0, ml: 1 }}>
                                         <Avatar
                                             sx={{
                                                 width: 30,
                                                 height: 30,
                                                 m: 1
                                             }}
-                                            alt="Account"
+                                            alt={user.me.username}
                                         >
                                             {`${user.me.username.slice(0, 1).toUpperCase()}`}
                                         </Avatar>

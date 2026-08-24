@@ -148,32 +148,47 @@ SNIPPET="  <!-- umami:start -->
 
 printf '%s\n' "$SNIPPET" | docker exec -i "$NGINX_CID" sh -c 'cat > /tmp/umami-snippet.html'
 
+# Every prerendered page is patched, not just index.html: /galerie/, /kontakt/,
+# the other prerendered routes and seo/template.html (the file the backend
+# renders / and /galerie/ from) each ship their own <head>.
 # Delete before insert so reruns stay idempotent and a changed id is picked up.
 # The second sed also strips tracker tags added outside these markers (e.g. an
 # older hand-placed snippet), which would otherwise survive as a duplicate.
 # Kept busybox-safe: no GNU-only sed commands.
 docker exec "$NGINX_CID" sh -c '
   set -e
-  f=/usr/share/nginx/html/index.html
-  sed -i "/<!-- umami:start -->/,/<!-- umami:end -->/d" "$f"
-  stray=$(grep -c "data-website-id" "$f" || true)
-  if [ "$stray" -gt 0 ]; then
-    echo "    removing $stray tracker tag(s) found outside the markers"
-    sed -i "s|<script[^>]*data-website-id[^>]*></script>||g" "$f"
-  fi
-  awk "/<\/head>/ { while ((getline l < \"/tmp/umami-snippet.html\") > 0) print l } { print }" \
-      "$f" > "$f.new"
-  mv "$f.new" "$f"
-  chmod 644 "$f"
+  for f in $(find /usr/share/nginx/html -name "*.html"); do
+    # Only the app pages carry the SPA root (nginx default error pages do not)
+    grep -q "id=\"root\"" "$f" || continue
+    sed -i "/<!-- umami:start -->/,/<!-- umami:end -->/d" "$f"
+    stray=$(grep -c "data-website-id" "$f" || true)
+    if [ "$stray" -gt 0 ]; then
+      echo "    removing $stray tracker tag(s) found outside the markers in $f"
+      sed -i "s|<script[^>]*data-website-id[^>]*></script>||g" "$f"
+    fi
+    awk "/<\/head>/ { while ((getline l < \"/tmp/umami-snippet.html\") > 0) print l } { print }" \
+        "$f" > "$f.new"
+    mv "$f.new" "$f"
+    chmod 644 "$f"
+    # Stale precompressed copies would disagree with the patched HTML.
+    rm -f "$f.br" "$f.gz"
+  done
   rm -f /tmp/umami-snippet.html
-  # Stale precompressed copy would disagree with the patched index.html.
-  rm -f "$f.br"
 '
 
 if [ $? -ne 0 ]; then
-  echo "Error: failed to patch index.html in the nginx container!"
+  echo "Error: failed to patch the served HTML in the nginx container!"
   exit 1
 fi
 
-echo "### Injected:"
-docker exec "$NGINX_CID" grep -A1 "umami:start" /usr/share/nginx/html/index.html
+# The backend renders / and /galerie/ from seo/template.html, which now carries
+# the tracker, so re-render immediately instead of waiting for the next beat tick.
+BACKEND_CID=$($COMPOSE ps -q backend)
+if [ -n "$BACKEND_CID" ]; then
+  echo "### Re-rendering the prerendered SEO pages ..."
+  docker exec "$BACKEND_CID" python manage.py render_seo \
+    || echo "Warning: render_seo failed, the scheduled task will retry!"
+fi
+
+echo "### Injected into:"
+docker exec "$NGINX_CID" sh -c 'find /usr/share/nginx/html -name "*.html" -exec grep -l "umami:start" {} +'

@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import MainLayout from '@/common/components/layout/layout';
 import NotFound from '@/common/components/error/notFound/notFound';
@@ -7,80 +8,83 @@ import Snackbars from '@/common/components/snackbars/snackbars';
 import { getArchiveUrl, getContactUrl, getEnterWallUrl, getHomeUrl, getSubmitJokeUrl } from '@/assets/endpoints/app/appEndpoints';
 import { getSettingsUrl } from '@/assets/endpoints/app/settingEndpoints';
 import { getNewsletterUrl } from '@/assets/endpoints/app/newsletterEndpoints';
-import SubmitJoke from '@/main/submitJoke/submitJoke';
-import ContactForm from '@/main/contact/contactForm';
 import { getImprintUrl, getPrivacyPolicyUrl } from '@/assets/endpoints/app/legalEndpoints';
-import PrivacyPolicy from '@/main/legals/privacyPolicy';
-import Impressum from '@/main/legals/impressum';
-import EnterWall from '@/main/enterWall/enterWall';
 import FeatureSelectorWrapper from '@/common/components/featureSelectorWrapper';
 import authenticationRoutes from '@/main/authentication/authentication';
 import newsletterRoutes from '@/main/newsletter/newsletter';
 import settingsRoutes from '@/main/settings/settings';
-import Archive from '@/main/archive/archive';
+import SeoHead from '@/seo/seoHead';
+
+const Archive = lazy(() => import('@/main/archive/archive'));
+const SubmitJoke = lazy(() => import('@/main/submitJoke/submitJoke'));
+const ContactForm = lazy(() => import('@/main/contact/contactForm'));
+const PrivacyPolicy = lazy(() => import('@/main/legals/privacyPolicy'));
+const Impressum = lazy(() => import('@/main/legals/impressum'));
+const EnterWall = lazy(() => import('@/main/enterWall/enterWall'));
 
 const Routing = createBrowserRouter([
   {
-    element: <Snackbars />,
+    element: <SeoHead />,
     children: [
       {
-        path: getAuthenticationUrl(),
-        element: <FeatureSelectorWrapper feature="authentication" />,
-        children: authenticationRoutes,
-      },
-      {
-        path: getNewsletterUrl(),
-        element: <FeatureSelectorWrapper feature="newsletter" />,
-        children: newsletterRoutes,
-      },
-      {
-        path: getEnterWallUrl(),
-        element: <EnterWall />,
-      },
-      {
-        element: <MainLayout />,
+        element: <Snackbars />,
         children: [
           {
-            path: "*",
-            element: <NotFound />,
+            path: getAuthenticationUrl(),
+            element: <FeatureSelectorWrapper feature="authentication" />,
+            children: authenticationRoutes,
           },
           {
-            element: <FeatureSelectorWrapper feature="app" />,
+            path: getNewsletterUrl(),
+            element: <FeatureSelectorWrapper feature="newsletter" />,
+            children: newsletterRoutes,
+          },
+          {
+            path: getEnterWallUrl(),
+            element: <EnterWall />,
+          },
+          {
+            element: <MainLayout />,
             children: [
               {
-                path: getHomeUrl(),
-                element: <Home />,
+                path: "*",
+                element: <NotFound />,
               },
               {
-                path: getArchiveUrl(),
-                element: <Archive />,
+                element: <FeatureSelectorWrapper feature="app" />,
+                children: [
+                  {
+                    path: getHomeUrl(),
+                    element: <Home />,
+                  },
+                  {
+                    path: getArchiveUrl(),
+                    element: <Archive />,
+                  },
+                  {
+                    path: getContactUrl(),
+                    element: <ContactForm />,
+                  },
+                  {
+                    path: getSubmitJokeUrl(),
+                    element: <SubmitJoke />,
+                  },
+                  {
+                    path: getPrivacyPolicyUrl(),
+                    element: <PrivacyPolicy />,
+                  },
+                  {
+                    path: getImprintUrl(),
+                    element: <Impressum />,
+                  },
+                ],
               },
-              // {
-              //   path: getArchiveUrl() + getArchiveItemUrl(),
-              //   element: <ArchiveItem />,
-              // },
               {
-                path: getContactUrl(),
-                element: <ContactForm />,
-              },
-              {
-                path: getSubmitJokeUrl(),
-                element: <SubmitJoke />,
-              },
-              {
-                path: getPrivacyPolicyUrl(),
-                element: <PrivacyPolicy />,
-              },
-              {
-                path: getImprintUrl(),
-                element: <Impressum />,
+                path: getSettingsUrl() + "*",
+                element: <FeatureSelectorWrapper feature="settings" />,
+                children: settingsRoutes,
               },
             ],
-          },
-          {
-            path: getSettingsUrl() + "*",
-            element: <FeatureSelectorWrapper feature="settings" />,
-            children: settingsRoutes,
           },
         ],
       },

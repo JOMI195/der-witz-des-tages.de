@@ -4,6 +4,7 @@ from django.core.files.storage import default_storage
 from jokes.models import Joke, JokePicture, get_joke_picture_upload_path
 from jokes.joke_picture.image import generate_image_content
 from jokes.joke_picture.prompt import generateJokePicturePrompt
+from jokes.joke_picture.variants import generate_variants
 from jokes.models import Joke, JokePicture
 from django.db import transaction
 
@@ -35,5 +36,8 @@ def save_image_to_model(joke: Joke, image_data: bytes) -> JokePicture:
 
         # Save the new image
         joke_picture.image.save(image_file.name, image_file, save=True)
+
+        # Resized variants for the website (srcset) and the newsletter
+        generate_variants(joke_picture.image)
 
         return joke_picture
