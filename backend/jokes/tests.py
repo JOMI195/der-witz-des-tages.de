@@ -12,7 +12,7 @@ from PIL import Image
 
 from jokes.joke_picture.joke_picture import save_image_to_model
 from jokes.joke_picture.variants import has_all_variants, variant_names
-from jokes.models import Joke, JokePicture, ShareableImage
+from jokes.models import Joke, JokeOfTheDay, JokePicture, ShareableImage
 from jokes.sharableImage.sharableImage import save_shareable_image_to_model
 
 
@@ -195,3 +195,81 @@ class CleanupOrphanedMediaTests(ImageStorageTestCase):
         save_image_to_model(joke=self.joke, image_data=jpeg_bytes())
 
         self.assertIn("nothing to clean up", self.cleanup())
+
+
+COMMAND = "jokes.management.commands.backfill_joke_of_the_day_media"
+
+
+class BackfillJokeOfTheDayMediaTests(ImageStorageTestCase):
+    def setUp(self):
+        super().setUp()
+        JokeOfTheDay.objects.create(joke=self.joke)
+        self.untouched_joke = Joke.objects.create(text="Nie Witz des Tages", created_by=self.user)
+
+    def backfill(self, *args, screenshot_fails: bool = False) -> str:
+        """Stubs the image API, the html template and the headless browser."""
+        output = StringIO()
+        with patch(
+            f"{COMMAND}.get_or_create_joke_picture",
+            side_effect=lambda joke: save_image_to_model(joke=joke, image_data=jpeg_bytes()),
+        ), patch(
+            f"{COMMAND}.get_shareable_image_html_template", return_value="<html></html>"
+        ), patch(
+            f"{COMMAND}.capture_screenshot",
+            return_value=None if screenshot_fails else jpeg_bytes(),
+        ):
+            call_command("backfill_joke_of_the_day_media", *args, stdout=output, stderr=output)
+        return output.getvalue()
+
+    def test_dry_run_reports_without_creating_anything(self):
+        output = self.backfill("--dry-run")
+
+        self.assertIn("picture missing", output)
+        self.assertIn("shareable image missing", output)
+        self.assertIn("1 would change", output)
+        self.assertFalse(JokePicture.objects.exists())
+        self.assertFalse(ShareableImage.objects.exists())
+
+    def test_creates_picture_variants_and_shareable_image(self):
+        self.backfill()
+
+        picture = JokePicture.objects.get(joke=self.joke)
+        self.assertTrue(has_all_variants(picture.image))
+        shareable_image = ShareableImage.objects.get(joke=self.joke)
+        self.assertTrue(os.path.isfile(self.absolute(shareable_image.image.name)))
+
+    def test_ignores_jokes_that_were_never_joke_of_the_day(self):
+        self.backfill()
+
+        self.assertFalse(JokePicture.objects.filter(joke=self.untouched_joke).exists())
+        self.assertFalse(ShareableImage.objects.filter(joke=self.untouched_joke).exists())
+
+    def test_generates_only_the_missing_variants(self):
+        picture = save_image_to_model(joke=self.joke, image_data=jpeg_bytes())
+        os.remove(self.absolute(variant_names(picture.image.name)[0]))
+
+        output = self.backfill()
+
+        self.assertIn("variants generated", output)
+        self.assertTrue(has_all_variants(JokePicture.objects.get(joke=self.joke).image))
+
+    def test_reports_complete_jokes_as_nothing_to_do(self):
+        self.backfill()
+
+        output = self.backfill()
+
+        self.assertIn("0 changed / 1 already complete", output)
+
+    def test_skip_pictures_leaves_the_image_api_alone(self):
+        output = self.backfill("--skip-pictures")
+
+        self.assertFalse(JokePicture.objects.exists())
+        self.assertIn("shareable image skipped, no picture", output)
+
+    def test_failed_screenshot_is_reported_and_does_not_abort(self):
+        output = self.backfill(screenshot_fails=True)
+
+        self.assertIn("screenshot failed", output)
+        self.assertIn("1 failed", output)
+        self.assertFalse(ShareableImage.objects.exists())
+        self.assertTrue(JokePicture.objects.exists())
