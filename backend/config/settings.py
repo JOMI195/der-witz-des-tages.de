@@ -282,3 +282,22 @@ FRONTEND_NEWSLETTER_RECIEVER_UNSUBSCRIBE_URL = (
     "joke-newsletter/newsletter-recievers/unsubscribe/{unsubscribe_token}"
 )
 FRONTEND_CONTACT_URL = "kontakt/"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {"format": "%(asctime)s %(levelname)s %(name)s %(message)s"},
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "standard"},
+    },
+    "root": {"handlers": ["console"], "level": "WARNING"},
+    "loggers": {
+        "jokes": {"level": "INFO"},
+        "joke_newsletter": {"level": "INFO"},
+        "seo": {"level": "INFO"},
+        "socials_sharing": {"level": "INFO"},
+        "workflows": {"level": "INFO"},
+    },
+}

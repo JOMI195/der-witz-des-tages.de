@@ -33,6 +33,19 @@ def variant_names(image_name: str) -> List[str]:
     return [variant_name(image_name, suffix) for suffix, _, _, _ in ALL_VARIANTS]
 
 
+def _directory_writable(image_name: str) -> bool:
+    """
+    Variants live next to the original, so an unwritable picture directory has
+    to be reported once instead of once per variant.
+    """
+    try:
+        directory = os.path.dirname(default_storage.path(image_name))
+    except (NotImplementedError, AttributeError):
+        return True  # non-filesystem storage, let the write itself decide
+
+    return os.access(directory, os.W_OK)
+
+
 def _image_name(image_field) -> Optional[str]:
     name = getattr(image_field, "name", None) or None
     return name
@@ -59,6 +72,15 @@ def generate_variants(image_field: FieldFile, overwrite: bool = False) -> Dict[s
             original.load()
     except Exception:
         logger.exception("Could not read joke picture %s", image_name)
+        return created
+
+    if not _directory_writable(image_name):
+        logger.error(
+            "Cannot write variants next to %s: the directory is not writable by this user. "
+            "Fix the ownership of the media volume, e.g. "
+            "docker exec -u root backend chown -R app:app /home/app/backend/mediafiles",
+            image_name,
+        )
         return created
 
     for suffix, width, image_format, options in ALL_VARIANTS:
