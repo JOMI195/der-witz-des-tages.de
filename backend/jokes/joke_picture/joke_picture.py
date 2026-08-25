@@ -1,12 +1,10 @@
-import os
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
-from jokes.models import Joke, JokePicture, get_joke_picture_upload_path
+from django.db import transaction
+
 from jokes.joke_picture.image import generate_image_content
 from jokes.joke_picture.prompt import generateJokePicturePrompt
 from jokes.joke_picture.variants import generate_variants
-from jokes.models import Joke, JokePicture
-from django.db import transaction
+from jokes.models import Joke, JokePicture, discard_image_file
 
 
 def get_or_create_joke_picture(joke: Joke) -> JokePicture:
@@ -17,27 +15,21 @@ def get_or_create_joke_picture(joke: Joke) -> JokePicture:
 
 
 def save_image_to_model(joke: Joke, image_data: bytes) -> JokePicture:
+    # only the extension survives, upload_to rebuilds the whole path
+    image_file = ContentFile(image_data, name=f"joke_{joke.id}.jpg")
+
     with transaction.atomic():
-        temp_joke_picture = JokePicture(joke=joke)
-        temp_filename = f"temp_joke_{joke.id}.jpg"
-        full_path = get_joke_picture_upload_path(temp_joke_picture, temp_filename)
-        image_file = ContentFile(image_data, name=os.path.basename(full_path))
-        joke_picture, created = JokePicture.objects.get_or_create(joke=joke)
+        joke_picture, _ = JokePicture.objects.get_or_create(joke=joke)
+        previous_name = joke_picture.image.name
 
-        # If updating an existing image, delete the old one
-        if not created and joke_picture.image:
-            old_path = joke_picture.image.path
-            default_storage.delete(old_path)
+        try:
+            joke_picture.image.save(image_file.name, image_file, save=True)
+            generate_variants(joke_picture.image)
+        except Exception:
+            # the file reaches storage before the row is written, so a rollback
+            # would leave it behind
+            if joke_picture.image.name != previous_name:
+                discard_image_file(joke_picture.image.name)
+            raise
 
-            # Remove the empty directory if it exists
-            old_dir = os.path.dirname(old_path)
-            if os.path.exists(old_dir) and not os.listdir(old_dir):
-                os.rmdir(old_dir)
-
-        # Save the new image
-        joke_picture.image.save(image_file.name, image_file, save=True)
-
-        # Resized variants for the website (srcset) and the newsletter
-        generate_variants(joke_picture.image)
-
-        return joke_picture
+    return joke_picture

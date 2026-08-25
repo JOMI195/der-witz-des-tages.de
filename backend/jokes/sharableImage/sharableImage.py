@@ -1,29 +1,24 @@
-from jokes.models import ShareableImage, Joke, get_shareable_image_upload_path
-import os
 from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.db import transaction
+
+from jokes.models import Joke, ShareableImage, discard_image_file
 
 
 def save_shareable_image_to_model(joke: Joke, image_data: bytes) -> ShareableImage:
+    # only the extension survives, upload_to rebuilds the whole path
+    image_file = ContentFile(image_data, name=f"shareable_{joke.id}.jpg")
+
     with transaction.atomic():
-        temp_shareable_image = ShareableImage(joke=joke)
-        temp_filename = f"temp_joke_{joke.id}.jpg"
-        full_path = get_shareable_image_upload_path(temp_shareable_image, temp_filename)
-        image_file = ContentFile(image_data, name=os.path.basename(full_path))
-        shareable_image, created = ShareableImage.objects.get_or_create(joke=joke)
+        shareable_image, _ = ShareableImage.objects.get_or_create(joke=joke)
+        previous_name = shareable_image.image.name
 
-        # If updating an existing image, delete the old one
-        if not created and shareable_image.image:
-            old_path = shareable_image.image.path
-            default_storage.delete(old_path)
+        try:
+            shareable_image.image.save(image_file.name, image_file, save=True)
+        except Exception:
+            # the file reaches storage before the row is written, so a rollback
+            # would leave it behind
+            if shareable_image.image.name != previous_name:
+                discard_image_file(shareable_image.image.name, with_variants=False)
+            raise
 
-            # Remove the empty directory if it exists
-            old_dir = os.path.dirname(old_path)
-            if os.path.exists(old_dir) and not os.listdir(old_dir):
-                os.rmdir(old_dir)
-
-        # Save the new image
-        shareable_image.image.save(image_file.name, image_file, save=True)
-
-        return shareable_image
+    return shareable_image

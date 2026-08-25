@@ -1,10 +1,51 @@
 import os
 import uuid
 from django.conf import settings
-from django.db import models
+from django.db import models, transaction
 from django.core.files.storage import default_storage
 from django.core.validators import MinValueValidator, MaxValueValidator
-from jokes.joke_picture.variants import delete_variants, variant_names
+from jokes.joke_picture.variants import delete_variants
+
+
+def discard_image_file(image_name: str, with_variants: bool = True) -> None:
+    """
+    Removes a stored image, its variants and the obfuscated directory it owned.
+
+    Safe to call twice. Only ever call it through transaction.on_commit: a file
+    deleted inside a transaction that later rolls back is gone for good.
+    """
+    if not image_name:
+        return
+
+    if with_variants:
+        delete_variants(image_name)
+
+    if default_storage.exists(image_name):
+        default_storage.delete(image_name)
+
+    directory = os.path.dirname(default_storage.path(image_name))
+    if os.path.isdir(directory) and not os.listdir(directory):
+        try:
+            os.rmdir(directory)
+        except OSError:
+            pass
+
+
+def _replaced_image_name(model, instance) -> str:
+    """
+    The stored name this save is about to overwrite.
+
+    Reads the raw column instead of building a FieldFile, so a row that carries no
+    file yet - the state get_or_create leaves behind - cannot raise here.
+    """
+    if not instance.pk:
+        return ""
+
+    stored_name = (
+        model.objects.filter(pk=instance.pk).values_list("image", flat=True).first()
+        or ""
+    )
+    return stored_name if stored_name != instance.image.name else ""
 
 
 class Joke(models.Model):
@@ -40,46 +81,20 @@ class JokePicture(models.Model):
         return f"Picture for Joke ID {self.joke.id}"
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            try:
-                old_instance = JokePicture.objects.get(pk=self.pk)
-                if old_instance.image != self.image:
-                    old_dir = os.path.dirname(old_instance.image.path)
-                    delete_variants(old_instance.image)
-                    old_instance.image.delete(save=False)
-                    # every upload gets its own obfuscated directory, so the old
-                    # one is empty now and would linger otherwise
-                    if os.path.isdir(old_dir) and not os.listdir(old_dir):
-                        os.rmdir(old_dir)
-            except JokePicture.DoesNotExist:
-                pass
+        replaced_name = _replaced_image_name(JokePicture, self)
+
         super().save(*args, **kwargs)
 
+        if replaced_name:
+            transaction.on_commit(lambda: discard_image_file(replaced_name))
+
     def delete(self, *args, **kwargs):
-        if self.image:
-            image_path = self.image.path
-            dir_path = os.path.dirname(image_path)
-            variant_paths = [
-                os.path.join(settings.MEDIA_ROOT, name) for name in variant_names(self.image.name)
-            ]
-            delete_variants(self.image)
-        else:
-            image_path = None
-            dir_path = None
-            variant_paths = []
+        image_name = self.image.name
 
         super().delete(*args, **kwargs)
 
-        if image_path and os.path.isfile(image_path):
-            default_storage.delete(image_path)
-
-        # A variant that survived the storage delete would keep the directory alive
-        for variant_path in variant_paths:
-            if os.path.isfile(variant_path):
-                os.remove(variant_path)
-
-        if dir_path and os.path.exists(dir_path) and not os.listdir(dir_path):
-            os.rmdir(dir_path)
+        if image_name:
+            transaction.on_commit(lambda: discard_image_file(image_name))
 
 
 def get_shareable_image_upload_path(instance, filename):
@@ -101,29 +116,24 @@ class ShareableImage(models.Model):
         return f"Shareable Image for Joke ID {self.joke.id}"
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            try:
-                old_instance = ShareableImage.objects.get(pk=self.pk)
-                if old_instance.image != self.image:
-                    old_instance.image.delete(save=False)
-            except ShareableImage.DoesNotExist:
-                pass
+        replaced_name = _replaced_image_name(ShareableImage, self)
+
         super().save(*args, **kwargs)
 
+        if replaced_name:
+            transaction.on_commit(
+                lambda: discard_image_file(replaced_name, with_variants=False)
+            )
+
     def delete(self, *args, **kwargs):
-        if self.image:
-            image_path = self.image.path
-            dir_path = os.path.dirname(image_path)
-        else:
-            image_path = None
-            dir_path = None
+        image_name = self.image.name
 
         super().delete(*args, **kwargs)
 
-        if image_path and os.path.isfile(image_path):
-            default_storage.delete(image_path)
-        if dir_path and os.path.exists(dir_path) and not os.listdir(dir_path):
-            os.rmdir(dir_path)
+        if image_name:
+            transaction.on_commit(
+                lambda: discard_image_file(image_name, with_variants=False)
+            )
 
 
 class JokeOfTheDay(models.Model):

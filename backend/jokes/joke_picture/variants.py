@@ -47,8 +47,10 @@ def _directory_writable(image_name: str) -> bool:
 
 
 def _image_name(image_field) -> Optional[str]:
-    name = getattr(image_field, "name", None) or None
-    return name
+    """Accepts a FieldFile or the stored name, so cleanup can work without an instance."""
+    if isinstance(image_field, str):
+        return image_field or None
+    return getattr(image_field, "name", None) or None
 
 
 def generate_variants(image_field: FieldFile, overwrite: bool = False) -> Dict[str, str]:
