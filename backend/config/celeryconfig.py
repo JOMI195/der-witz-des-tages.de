@@ -41,3 +41,9 @@ if PRODUCTION:
         "task": "workflows.tasks.joke_of_the_day_full_workflow",
         "schedule": crontab(hour=5, minute=0),  # Runs daily at 5 AM
     }
+    # Reposts the jokes missed while Instagram sharing was broken. The task caps
+    # itself per day, so the surplus slots are no-ops once the budget is spent.
+    beat_schedule["instagram-backfill-feed"] = {
+        "task": "socials_sharing.tasks.dispatch_instagram_backfill",
+        "schedule": crontab(hour="11,16,20", minute=0),
+    }

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from datetime import timedelta
+import datetime
 import os
 from pathlib import Path
 
@@ -282,6 +283,11 @@ FRONTEND_NEWSLETTER_RECIEVER_UNSUBSCRIBE_URL = (
     "joke-newsletter/newsletter-recievers/unsubscribe/{unsubscribe_token}"
 )
 FRONTEND_CONTACT_URL = "kontakt/"
+
+# First day the Instagram sharing was broken; the backfill never reaches behind it.
+INSTAGRAM_BACKFILL_SINCE = datetime.date.fromisoformat(
+    os.environ.get("INSTAGRAM_BACKFILL_SINCE", "2026-02-03")
+)
 
 LOGGING = {
     "version": 1,

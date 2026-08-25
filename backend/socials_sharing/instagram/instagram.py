@@ -1,13 +1,14 @@
-from datetime import date
 import logging
 import os
 
+from django.utils import timezone
 from instagrapi import Client
 from instagrapi.exceptions import LoginRequired
 
 from jokes.joke_of_the_day.joke_of_the_day import get_latest_joke_of_the_day
 from jokes.models import JokeOfTheDay, ShareableImage
 from socials_sharing.instagram.session import InstagramSessionHandler
+from socials_sharing.models import InstagramShare
 
 logger = logging.getLogger(__name__)
 
@@ -64,9 +65,14 @@ def login_user_to_instagram() -> Client:
     return client
 
 
-def build_caption(today: str) -> str:
+def joke_of_the_day_date(joke_of_the_day: JokeOfTheDay) -> str:
+    """The day the joke was picked for, which is not today for a backfilled post."""
+    return timezone.localtime(joke_of_the_day.created_at).strftime("%d.%m.%Y")
+
+
+def build_caption(day: str) -> str:
     caption = (
-        f"\nDer Witz des Tages vom {today} 😂\n\n"
+        f"\nDer Witz des Tages vom {day} 😂\n\n"
         f"Besuche auch unsere Website www.der-witz-des-tages.de (Link in der Bio) für weitere tolle Features ✨:\n\n"
         f"👥 Reiche deinen Lieblingswitz ein und zeige der Welt wie lustig du bist!\n"
         f"📬 Abonniere unseren Email-Newsletter um tägliche Witze direkt in dein Postfach zu erhalten!\n\n"
@@ -81,57 +87,124 @@ def build_caption(today: str) -> str:
     return caption
 
 
-def upload_shareable_image(client: Client) -> None:
+def build_accessibility_text(joke_text: str, day: str) -> str:
+    return (
+        f"An image featuring the joke of the day from the date {day}. "
+        f"The joke of the day is: {joke_text} and is printed on the bottom of the image. "
+        f"In the center is an illustration that highlights the joke of the day. "
+        f"Visit www.der-witz-des-tages.de for more jokes and information!"
+    ).strip()
+
+
+def get_shareable_image(joke_of_the_day: JokeOfTheDay) -> ShareableImage:
     """
-    Shares the shareable image on Instagram, in the feed and as a story.
+    Raises:
+        Exception: If the joke has no shareable image or the file is gone
+    """
+    shareable_image: ShareableImage = getattr(
+        joke_of_the_day.joke, "shareable_image", None
+    )
+    if shareable_image is None or not shareable_image.image:
+        raise Exception(f"Joke of the day {joke_of_the_day.pk} has no shareable image")
+
+    if not os.path.exists(shareable_image.image.path):
+        raise Exception(
+            f"Shareable image file for joke of the day {joke_of_the_day.pk} is missing: "
+            f"{shareable_image.image.name}"
+        )
+
+    return shareable_image
+
+
+def upload_to_feed(
+    client: Client, joke_of_the_day: JokeOfTheDay, is_backfill: bool = False
+):
+    """
+    Uploads the shareable image to the feed and records it in the ledger.
 
     Raises:
-        Exception: If the image is missing or either upload fails
+        Exception: If the upload fails or Instagram returns no media
+    """
+    shareable_image = get_shareable_image(joke_of_the_day)
+    day = joke_of_the_day_date(joke_of_the_day)
+
+    media = client.photo_upload(
+        path=shareable_image.image.path,
+        caption=build_caption(day),
+        extra_data={
+            "custom_accessibility_caption": build_accessibility_text(
+                joke_of_the_day.joke.text, day
+            )
+        },
+    )
+
+    if not getattr(media, "pk", None):
+        raise Exception("Upload to feed returned no media object")
+
+    InstagramShare.objects.create(
+        joke=joke_of_the_day.joke,
+        kind=InstagramShare.FEED,
+        media_pk=str(media.pk),
+        is_backfill=is_backfill,
+    )
+    logger.info("Uploaded joke %s to feed (%s)", joke_of_the_day.joke_id, media.pk)
+
+    return media
+
+
+def upload_to_story(client: Client, joke_of_the_day: JokeOfTheDay):
+    """
+    Uploads the shareable image as a story and records it in the ledger.
+
+    Raises:
+        Exception: If the upload fails or Instagram returns no media
+    """
+    shareable_image = get_shareable_image(joke_of_the_day)
+    day = joke_of_the_day_date(joke_of_the_day)
+
+    media = client.photo_upload_to_story(
+        path=shareable_image.image.path,
+        extra_data={
+            "custom_accessibility_caption": build_accessibility_text(
+                joke_of_the_day.joke.text, day
+            )
+        },
+    )
+
+    if not getattr(media, "pk", None):
+        raise Exception("Upload to story returned no media object")
+
+    InstagramShare.objects.update_or_create(
+        joke=joke_of_the_day.joke,
+        kind=InstagramShare.STORY,
+        defaults={"media_pk": str(media.pk)},
+    )
+    logger.info("Uploaded joke %s to story (%s)", joke_of_the_day.joke_id, media.pk)
+
+    return media
+
+
+def upload_shareable_image(client: Client) -> None:
+    """
+    Shares the latest joke of the day on Instagram, in the feed and as a story.
+
+    Raises:
+        Exception: If there is nothing to share or either upload fails
     """
     latest_joke_of_the_day: JokeOfTheDay = get_latest_joke_of_the_day()
     if latest_joke_of_the_day is None:
         raise Exception("No joke of the day exists, nothing to share")
 
-    shareable_image: ShareableImage = getattr(
-        latest_joke_of_the_day.joke, "shareable_image", None
-    )
-    if shareable_image is None or not shareable_image.image:
-        raise Exception(
-            f"Joke of the day {latest_joke_of_the_day.pk} has no shareable image"
-        )
-
-    today = date.today().strftime("%d.%m.%Y")
-    caption = build_caption(today)
-    accessibility_text = (
-        f"An image featuring the joke of the day from the date {today}. "
-        f"The joke of the day is: {latest_joke_of_the_day.joke.text} and is printed on the bottom of the image. "
-        f"In the center is an illustration that highlights the joke of the day. "
-        f"Visit www.der-witz-des-tages.de for more jokes and information!"
-    ).strip()
-
-    image_path = shareable_image.image.path
-    extra_data = {"custom_accessibility_caption": accessibility_text}
-
     failures = []
 
     try:
-        feed_media = client.photo_upload(
-            path=image_path, caption=caption, extra_data=extra_data
-        )
-        if not getattr(feed_media, "pk", None):
-            raise Exception("No media object returned")
-        logger.info("Uploaded shareable image to feed (%s)", feed_media.pk)
+        upload_to_feed(client, latest_joke_of_the_day)
     except Exception as e:
         logger.exception("Failed to upload shareable image to feed")
         failures.append(f"feed: {e}")
 
     try:
-        story_media = client.photo_upload_to_story(
-            path=image_path, extra_data=extra_data
-        )
-        if not getattr(story_media, "pk", None):
-            raise Exception("No media object returned")
-        logger.info("Uploaded shareable image to story (%s)", story_media.pk)
+        upload_to_story(client, latest_joke_of_the_day)
     except Exception as e:
         logger.exception("Failed to upload shareable image to story")
         failures.append(f"story: {e}")
